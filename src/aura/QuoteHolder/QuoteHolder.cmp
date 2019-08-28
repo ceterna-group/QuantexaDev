@@ -6,34 +6,114 @@
                 implements="flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome">
 
     <aura:attribute name="families" type="Object[]" />
+    <aura:attribute name="useCases" type="Object[]" />
+    <aura:attribute name="familyGroups" type="Object[]" />
+
 <!--    <aura:attribute name="useCases" type="String[]" />-->
 <!--    <aura:attribute name="useCases" type="String[]" />-->
 
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
+<!--    <lightning:icon iconName="utility:add" size="large" alternativeText="sss"/>-->
+
+
     <div class="slds-card">
 
         <div class="slds-p-around--small">
-            CONTENT {!v.families.length}
+            CONTENT {!v.families.length} {!v.familyGroups.length}
 
         </div>
 
         <div class="dateGrid slds-p-around--small" style="margin-bottom: 15px;">
-            <div>DATES</div>
-            <div class="value">YEAR 1</div>
-            <div class="value">YEAR 2</div>
-            <div class="value">YEAR 3</div>
-            <div class="value">YEAR 4</div>
-            <div class="value">YEAR 5</div>
-            <div class="value">TOTAL</div>
+            <div class="date">DATES</div>
+            <div class="date value">YEAR 1</div>
+            <div class="date value">YEAR 2</div>
+            <div class="date value">YEAR 3</div>
+            <div class="date value">YEAR 4</div>
+            <div class="date value">YEAR 5</div>
+            <div class="date value">TOTAL</div>
+            <div class="small">COMMENCING</div>
+            <div class="small value">1 Jan 2019</div>
+            <div class="small value">1 Jan 2020</div>
+            <div class="small value">1 Jan 2021</div>
+            <div class="small value">1 Jan 2022</div>
+            <div class="small value">1 Jan 2023</div>
+<!--            <lightning:icon iconName="action:approval" alternativeText="Approved" title="this"/>-->
+
         </div>
+
+        <aura:iteration items="{!v.familyGroups}" var="group">
+
+            <div class="family slds-p-around--small">
+                <div class="dateGrid familyHeader">
+                    <div>{!group.Name}</div>
+                    <div class="value">{!group.Year1}</div>
+                    <div class="value">{!group.Year2}</div>
+                    <div class="value">{!group.Year3}</div>
+                    <div class="value">{!group.Year4}</div>
+                    <div class="value">{!group.Year5}</div>
+                    <div class="value">{!group.Total}</div>
+                </div>
+
+
+                <aura:iteration items="{!group.UseCases}" var="useCase">
+<!--                    <div style="padding-left: 5px;">{!useCase.Name}</div>-->
+
+                    <div class="useCasePanel">
+                        <div style="padding-left: 5px;">{!useCase.Name}</div>
+
+<!--                        {!useCase.Products.length}-->
+
+
+                            <aura:iteration items="{!group.UseCases.useCase}" var="prod">
+
+                                <div class="dateGrid ">HI{!prod}
+<!--                                    <div>{!product}</div>-->
+
+                                </div>
+
+                            </aura:iteration>
+
+
+    <!--                        <div class="value">{!useCase.Year1}</div>-->
+    <!--                        <div class="value">{!useCase.Year2}</div>-->
+    <!--                        <div class="value">{!useCase.Year3}</div>-->
+    <!--                        <div class="value">{!useCase.Year4}</div>-->
+    <!--                        <div class="value">{!useCase.Year5}</div>-->
+    <!--                        <div class="value">{!useCase.Total}</div>-->
+                    </div>
+
+
+                </aura:iteration>
+
+                <div class="useCasePanel newFamily">
+                    <div class="newUseCase">
+                        <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"
+                               onchange="{!c.createFamily}" placeholder="New Use Case..."/>
+                        <datalist id="{!v.recordId}">
+                            <aura:iteration items="{!v.useCases}" var="useCase" indexVar="index">
+                                <option value="{!useCase}">{!useCase}</option>
+                            </aura:iteration>
+                        </datalist>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </aura:iteration>
 
 
 <!--        <div class="family slds-p-around&#45;&#45;medium">-->
         <div class="family slds-p-around--small">
             <div class="dateGrid familyHeader">
-                <div>Contextual Monitoring</div>
+                <div>
+                    <span><lightning:icon iconName="utility:groups"/></span>
+<!--                    <span>Contextual Monitoring</span>-->
+                </div>
                 <div class="value">£500,345</div>
                 <div class="value">£200,087</div>
                 <div class="value">£167,670</div>
@@ -61,8 +141,8 @@
         </div>
 
 
-        <div class=" =family slds-p-around--small">
-            <div class="newFamily">
+        <div class="family newFamily slds-p-around--small dateGrid">
+            <div class="">
                 <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"
                        onchange="{!c.createFamily}" placeholder="New Product Family..."/>
                 <datalist id="{!v.recordId}">
