@@ -5,9 +5,78 @@
 <aura:component description="QuoteHolder" controller="QuoteController" access="global"
                 implements="flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome">
 
+    <aura:attribute name="families" type="Object[]" />
+<!--    <aura:attribute name="useCases" type="String[]" />-->
+<!--    <aura:attribute name="useCases" type="String[]" />-->
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
     <div class="slds-card">
 
-        CONTENT
+        <div class="slds-p-around--small">
+            CONTENT {!v.families.length}
+
+        </div>
+
+        <div class="dateGrid slds-p-around--small" style="margin-bottom: 15px;">
+            <div>DATES</div>
+            <div class="value">YEAR 1</div>
+            <div class="value">YEAR 2</div>
+            <div class="value">YEAR 3</div>
+            <div class="value">YEAR 4</div>
+            <div class="value">YEAR 5</div>
+            <div class="value">TOTAL</div>
+        </div>
+
+
+<!--        <div class="family slds-p-around&#45;&#45;medium">-->
+        <div class="family slds-p-around--small">
+            <div class="dateGrid familyHeader">
+                <div>Contextual Monitoring</div>
+                <div class="value">£500,345</div>
+                <div class="value">£200,087</div>
+                <div class="value">£167,670</div>
+                <div class="value">£145,300</div>
+                <div class="value">£143,600</div>
+                <div class="value">£546,500</div>
+            </div>
+
+
+            <div class="dateGrid useCasePanel">
+                <div>AML Implementation</div>
+                <div class="value">£500,345</div>
+                <div class="value">£200,087</div>
+                <div class="value">£167,670</div>
+                <div class="value">£145,300</div>
+                <div class="value">£143,600</div>
+                <div class="value">£546,500</div>
+            </div>
+
+
+
+            <div class="lineGrid">
+
+            </div>
+        </div>
+
+
+        <div class=" =family slds-p-around--small">
+            <div class="newFamily">
+                <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"
+                       onchange="{!c.createFamily}" placeholder="New Product Family..."/>
+                <datalist id="{!v.recordId}">
+                    <aura:iteration items="{!v.families}" var="family" indexVar="index">
+                        <option value="{!family}">{!family}</option>
+                    </aura:iteration>
+                </datalist>
+            </div>
+
+        </div>
+
+
+
+
     </div>
 
 </aura:component>
