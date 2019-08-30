@@ -3,12 +3,7 @@
  */
 
 .THIS .newFamily {
-    /*width: 100%;*/
-    /*height: 100px;*/
-    /*border-radius: 3px;*/
-    /*background-color: lightgrey;*/
     cursor: pointer;
-
     opacity : 0.5;
 }
 
@@ -34,22 +29,26 @@
 }
 
 .THIS .value {
-    text-align: right;
-    padding-right: 5px;
+    /*text-align: right;*/
+    /*padding-right: 5px;*/
+    display: flex;
+    justify-content: flex-end;
 }
 
 .THIS .useCasePanel {
-    /*border-radius: 3px;*/
-    /*border: 0.5px solid #e1e1e1;*/
-    /*background-color: #f4f4f4;*/
-
     padding-top: 10px;
+    margin-top: 5px;
     border-top: 0.5px solid lightgrey;
     font-weight: lighter;
 }
 
 .THIS .newUseCase {
     width: 200px;
+    opacity: 0.2;
+}
+
+.THIS .newUseCase:hover {
+    opacity: 1;
 }
 
 .THIS .date {
@@ -57,6 +56,50 @@
 }
 
 .THIS .small {
-    /*font-size: 11px;*/
     opacity: 0.7;
+}
+
+.THIS input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.THIS input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.THIS .newValue {
+    /*border: .5px dashed lightgrey;*/
+    opacity: .3;
+    cursor: pointer;
+    font-size: 22px;
+    width: 100%;
+    height: 32px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px;
+    color: #b5b4b4;
+    background-color: #f3f1f1;
+    max-width: 100px;
+}
+
+.THIS .newValue:hover {
+    opacity: 1;
+}
+
+.THIS .slds-input {
+    text-align: right;
+}
+
+.THIS .productLine {
+
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #bbbbbb;
+    background-color: #d0cfcf;
 }

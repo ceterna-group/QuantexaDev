@@ -3,11 +3,12 @@
  -->
 
 <aura:component description="QuoteHolder" controller="QuoteController" access="global"
-                implements="flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome">
+                implements="force:hasRecordId,flexipage:availableForRecordHome">
 
     <aura:attribute name="families" type="Object[]" />
     <aura:attribute name="useCases" type="Object[]" />
     <aura:attribute name="familyGroups" type="Object[]" />
+    <aura:attribute name="productLines" type="Object[]" />
 
 <!--    <aura:attribute name="useCases" type="String[]" />-->
 <!--    <aura:attribute name="useCases" type="String[]" />-->
@@ -15,8 +16,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-<!--    <lightning:icon iconName="utility:add" size="large" alternativeText="sss"/>-->
-
+    <lightning:icon iconName="utility:add" size="large" alternativeText="sss"/>
 
     <div class="slds-card">
 
@@ -43,17 +43,31 @@
 
         </div>
 
+
+
         <aura:iteration items="{!v.familyGroups}" var="group">
 
             <div class="family slds-p-around--small">
                 <div class="dateGrid familyHeader">
                     <div>{!group.Name}</div>
-                    <div class="value">{!group.Year1}</div>
-                    <div class="value">{!group.Year2}</div>
-                    <div class="value">{!group.Year3}</div>
-                    <div class="value">{!group.Year4}</div>
-                    <div class="value">{!group.Year5}</div>
-                    <div class="value">{!group.Total}</div>
+                    <div class="value">
+                        <lightning:formattedNumber value="{!group.Year1}" style="currency" currencyCode="GBP" />
+                    </div>
+                    <div class="value">
+                        <lightning:formattedNumber value="{!group.Year2}" style="currency" currencyCode="GBP" />
+                    </div>
+                    <div class="value">
+                        <lightning:formattedNumber value="{!group.Year3}" style="currency" currencyCode="GBP" />
+                    </div>
+                    <div class="value">
+                        <lightning:formattedNumber value="{!group.Year4}" style="currency" currencyCode="GBP" />
+                    </div>
+                    <div class="value">
+                        <lightning:formattedNumber value="{!group.Year5}" style="currency" currencyCode="GBP" />
+                    </div>
+                    <div class="value">
+                        <lightning:formattedNumber value="{!group.Total}" style="currency" currencyCode="GBP" />
+                    </div>
                 </div>
 
 
@@ -63,39 +77,44 @@
                     <div class="useCasePanel">
                         <div style="padding-left: 5px;">{!useCase.Name}</div>
 
-<!--                        {!useCase.Products.length}-->
+                            <aura:iteration items="{!useCase.Products}" var="prod">
+
+                                <div class="dateGrid productLine">
+                                    <div style="padding-left: 15px;">{!prod.Name}</div>
 
 
-                            <aura:iteration items="{!group.UseCases.useCase}" var="prod">
+                                    <aura:iteration items="{!prod.Entries}" var="entry">
 
-                                <div class="dateGrid ">HI{!prod}
-<!--                                    <div>{!product}</div>-->
+                                        <div class="value">
+                                            <lightning:input value="{!entry.TotalPrice}" type="number" min="0"
+                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                        </div>
+
+                                    </aura:iteration>
+
+                                    <aura:if isTrue="{!prod.Entries.length != 5}">
+
+                                        <div class="value" onclick="{!c.addProductLine}">
+                                            <div class="newValue">+</div>
+                                        </div>
+                                    </aura:if>
+
 
                                 </div>
 
                             </aura:iteration>
-
-
-    <!--                        <div class="value">{!useCase.Year1}</div>-->
-    <!--                        <div class="value">{!useCase.Year2}</div>-->
-    <!--                        <div class="value">{!useCase.Year3}</div>-->
-    <!--                        <div class="value">{!useCase.Year4}</div>-->
-    <!--                        <div class="value">{!useCase.Year5}</div>-->
-    <!--                        <div class="value">{!useCase.Total}</div>-->
                     </div>
-
-
                 </aura:iteration>
 
-                <div class="useCasePanel newFamily">
-                    <div class="newUseCase">
-                        <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"
-                               onchange="{!c.createFamily}" placeholder="New Use Case..."/>
-                        <datalist id="{!v.recordId}">
-                            <aura:iteration items="{!v.useCases}" var="useCase" indexVar="index">
-                                <option value="{!useCase}">{!useCase}</option>
+<!--                <div class="useCasePanel">-->
+                    <div>
+                        <div class="newUseCase">
+                        <lightning:select label="" variant="label-hidden" >
+                            <option></option>
+                            <aura:iteration items="{!v.useCases}" var="case" indexVar="index">
+                                <option value="{!case}">{!case}</option>
                             </aura:iteration>
-                        </datalist>
+                        </lightning:select>
                     </div>
 
                 </div>

@@ -16,10 +16,10 @@
 
 
                 $C.set('v.families',response.getReturnValue()['FAMILIES']);
-                $C.set('v.useCases',response.getReturnValue()['FAMILIES']);
+                $C.set('v.useCases',response.getReturnValue()['USECASES']);
 
                 var familyGroups = [];
-
+                var productLines = [];
 
                 Object.keys(response.getReturnValue()['FAMILYGROUPS']).forEach(function(group){
 
@@ -34,7 +34,7 @@
                     family.Total    = 0;
                     family.UseCases = [];
 
-                    console.log(response.getReturnValue()['FAMILYGROUPS'][group]);
+                    // console.log(response.getReturnValue()['FAMILYGROUPS'][group]);
 
                     Object.keys(response.getReturnValue()['FAMILYGROUPS'][group]).forEach(function(caseName){
 
@@ -52,14 +52,25 @@
                         useCase.Products    = [];
 
                         Object.keys(response.getReturnValue()['FAMILYGROUPS'][group][caseName]).forEach(function(product){
-                            var product     = {};
-                            product.Name    = product;
-                            product.Entries = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
-                            useCase.Products.push(product);
+                            var prod        = {};
+                            prod.Family     = group;
+                            prod.UseCase    = caseName;
+                            prod.Name       = product;
+                            prod.Entries    = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
+                            useCase.Products.push(prod);
+
+                            prod.Entries.forEach(function (entry){
+                                if (entry.Year__c){
+                                    family['Year' + entry.Year__c] += entry.TotalPrice;
+                                }
+                               console.log(entry);
+                            });
+
+                            // productLines.push(product);
                         });
 
-                        console.log('products');
-                        console.log(useCase.Products);
+                        // console.log('products');
+                        // console.log(useCase.Products);
 
                         family.UseCases.push(useCase);
                     });
@@ -67,14 +78,36 @@
                     familyGroups.push(family);
                 });
                 $C.set('v.familyGroups',familyGroups);
+                $C.set('v.productLines',productLines);
 
-                // console.log(familyGroups);
+                console.log(familyGroups);
 
             }
 
 
         });
         $A.enqueueAction(getInfo);
+
+    },
+    addProductLine : function($C,$E,$H){
+
+
+        var insert = $C.get('c.insertLineItem');
+        insert.setParams({
+            recordId : $C.get('v.recordId'),
+            productId : '',
+            year : ''
+        });
+        insert.setCallback(this,function (response) {
+
+
+            console.log(response);
+
+
+
+        });
+
+        $A.enqueueAction(insert);
 
     }
 
