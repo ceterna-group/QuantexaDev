@@ -43,20 +43,22 @@
 
                         var useCase         = {};
                         useCase.Name        = caseName;
-                        useCase.Year1       = 0;
-                        useCase.Year2       = 0;
-                        useCase.Year3       = 0;
-                        useCase.Year4       = 0;
-                        useCase.Year5       = 0;
-                        useCase.Total       = 0;
+                        // useCase.Year1       = 0;
+                        // useCase.Year2       = 0;
+                        // useCase.Year3       = 0;
+                        // useCase.Year4       = 0;
+                        // useCase.Year5       = 0;
+                        // useCase.Total       = 0;
                         useCase.Products    = [];
 
                         Object.keys(response.getReturnValue()['FAMILYGROUPS'][group][caseName]).forEach(function(product){
                             var prod        = {};
-                            prod.Family     = group;
-                            prod.UseCase    = caseName;
-                            prod.Name       = product;
-                            prod.Entries    = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
+                            prod.Family             = group;
+                            prod.UseCase            = caseName;
+                            prod.Id                 = product.split(':')[2];
+                            prod.PricebookEntryId   = product.split(':')[3];
+                            prod.Name               = product.split(':')[0] + ': ' + product.split(':')[1];
+                            prod.Entries            = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
                             useCase.Products.push(prod);
 
                             prod.Entries.forEach(function (entry){
@@ -92,16 +94,26 @@
     addProductLine : function($C,$E,$H){
 
 
+        var sourceData = $E.currentTarget.dataset;
+
+
+        console.log(sourceData.id);
+        console.log(sourceData.week);
+
+
+        // console.log(source);
+
         var insert = $C.get('c.insertLineItem');
         insert.setParams({
             recordId : $C.get('v.recordId'),
-            productId : '',
-            year : ''
+            productId : sourceData.id,
+            pricebookEntryId : sourceData.pricebookEntryId,
+            year : sourceData.week
         });
         insert.setCallback(this,function (response) {
 
 
-            console.log(response);
+            console.log(response.getReturnValue());
 
 
 

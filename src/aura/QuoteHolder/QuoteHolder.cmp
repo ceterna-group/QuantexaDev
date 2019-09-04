@@ -94,7 +94,8 @@
 
                                     <aura:if isTrue="{!prod.Entries.length != 5}">
 
-                                        <div class="value" onclick="{!c.addProductLine}">
+                                        <div class="value" onclick="{!c.addProductLine}" data-id="{!prod.Id}"
+                                             data-week="{!prod.Entries.length + 1}" data-pricebookId="{!prod.PricebookEntryId}">
                                             <div class="newValue">+</div>
                                         </div>
                                     </aura:if>
