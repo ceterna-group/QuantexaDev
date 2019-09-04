@@ -84,6 +84,7 @@
 
 
                                     <div style="text-align: right;">
+                                        <div>QUANTITY</div>
                                         <div>PRICE</div>
                                         <div>DISCOUNT</div>
                                         <div>TOTAL</div>
@@ -93,9 +94,13 @@
                                     <aura:iteration items="{!prod.Entries}" var="entry">
 
 
-                                        <div >
+                                        <div>
                                             <div class="value">
-                                                <lightning:input value="{!entry.TotalPrice}" type="number" min="0"
+                                                <lightning:input value="{!entry.Quantity}" type="number" min="0"
+                                                                 variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                            </div>
+                                            <div class="value">
+                                                <lightning:input value="{!entry.UnitPrice}" type="decimal" min="0"
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
                                             </div>
                                             <div class="value">
@@ -103,7 +108,7 @@
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
                                             </div>
                                             <div class="value">
-                                                <lightning:formattedNumber value="100" style="currency" currencyCode="GBP" />
+                                                <lightning:formattedNumber value="{!entry.TotalPrice}" style="currency" currencyCode="GBP" />
                                             </div>
                                         </div>
 

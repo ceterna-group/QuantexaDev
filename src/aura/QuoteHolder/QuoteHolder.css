@@ -15,7 +15,7 @@
     border: 1px solid #dad9d9;
     border-radius: 3px;
     margin-bottom: 12px;
-    background-color: #f3f1f1;
+    background-color: #f9f7f7;
 }
 
 .THIS .familyHeader {
@@ -95,6 +95,8 @@
 
 .THIS .slds-input {
     text-align: right;
+    height: 25px !important;
+    min-height: 25px !important;
 }
 
 .THIS .productLine {
