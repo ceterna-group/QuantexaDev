@@ -33,6 +33,7 @@
     /*padding-right: 5px;*/
     display: flex;
     justify-content: flex-end;
+    padding-right: 5px;
 }
 
 .THIS .useCasePanel {
@@ -101,5 +102,5 @@
     padding-top: 4px;
     padding-bottom: 4px;
     border-bottom: 1px solid #bbbbbb;
-    background-color: #d0cfcf;
+    /*background-color: #d0cfcf;*/
 }

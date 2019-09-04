@@ -78,16 +78,33 @@
                         <div style="padding-left: 5px;">{!useCase.Name}</div>
 
                             <aura:iteration items="{!useCase.Products}" var="prod">
-
+                                <div style="padding-left: 15px;">{!prod.Name}</div>
                                 <div class="dateGrid productLine">
-                                    <div style="padding-left: 15px;">{!prod.Name}</div>
+<!--                                    <div style="padding-left: 15px;">{!prod.Name}</div>-->
 
+
+                                    <div style="text-align: right;">
+                                        <div>PRICE</div>
+                                        <div>DISCOUNT</div>
+                                        <div>TOTAL</div>
+
+                                    </div>
 
                                     <aura:iteration items="{!prod.Entries}" var="entry">
 
-                                        <div class="value">
-                                            <lightning:input value="{!entry.TotalPrice}" type="number" min="0"
-                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+
+                                        <div >
+                                            <div class="value">
+                                                <lightning:input value="{!entry.TotalPrice}" type="number" min="0"
+                                                                 variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                            </div>
+                                            <div class="value">
+                                                <lightning:input value="" type="number" min="0"
+                                                                 variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                            </div>
+                                            <div class="value">
+                                                <lightning:formattedNumber value="100" style="currency" currencyCode="GBP" />
+                                            </div>
                                         </div>
 
                                     </aura:iteration>
