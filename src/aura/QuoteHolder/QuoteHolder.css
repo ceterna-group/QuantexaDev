@@ -15,7 +15,7 @@
     border: 1px solid #dad9d9;
     border-radius: 3px;
     margin-bottom: 12px;
-    background-color: #f9f7f7;
+    /*background-color: #f9f7f7;*/
 }
 
 .THIS .familyHeader {
@@ -26,6 +26,11 @@
 .THIS .dateGrid {
     display: grid;
     grid-template-columns: 22% 13% 13% 13% 13% 13% 13%;
+}
+
+.THIS .quoteGrid {
+    display: grid;
+    grid-template-columns: 31% 16% 16% 16% 16% 5%;
 }
 
 .THIS .value {
@@ -85,7 +90,7 @@
     font-weight: bold;
     border-radius: 4px;
     color: #b5b4b4;
-    background-color: #f3f1f1;
+    /*background-color: #f3f1f1;*/
     max-width: 100px;
 }
 
@@ -104,5 +109,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     border-bottom: 1px solid #bbbbbb;
+    height:40px;
+    cursor: pointer;
     /*background-color: #d0cfcf;*/
 }

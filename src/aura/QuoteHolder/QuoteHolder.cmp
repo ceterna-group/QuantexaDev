@@ -15,8 +15,12 @@
 
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-
-    <lightning:icon iconName="utility:add" size="large" alternativeText="sss"/>
+<!--    <span class="slds-icon_container slds-icon-utility-announcement" title="Description of icon when needed">-->
+<!--        <svg class="slds-icon slds-icon-text-default" aria-hidden="true">-->
+<!--            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#announcement"></use>-->
+<!--        </svg>-->
+<!--        <span class="slds-assistive-text">Description of icon when needed</span>-->
+<!--    </span>-->
 
     <div class="slds-card">
 
@@ -48,53 +52,33 @@
         <aura:iteration items="{!v.familyGroups}" var="group">
 
             <div class="family slds-p-around--small">
-                <div class="dateGrid familyHeader">
+                <div class="quoteGrid familyHeader">
                     <div>{!group.Name}</div>
-                    <div class="value">
-                        <lightning:formattedNumber value="{!group.Year1}" style="currency" currencyCode="GBP" />
-                    </div>
-                    <div class="value">
-                        <lightning:formattedNumber value="{!group.Year2}" style="currency" currencyCode="GBP" />
-                    </div>
-                    <div class="value">
-                        <lightning:formattedNumber value="{!group.Year3}" style="currency" currencyCode="GBP" />
-                    </div>
-                    <div class="value">
-                        <lightning:formattedNumber value="{!group.Year4}" style="currency" currencyCode="GBP" />
-                    </div>
-                    <div class="value">
-                        <lightning:formattedNumber value="{!group.Year5}" style="currency" currencyCode="GBP" />
-                    </div>
-                    <div class="value">
-                        <lightning:formattedNumber value="{!group.Total}" style="currency" currencyCode="GBP" />
-                    </div>
+                    <div style="text-align: right;">QUANTITY</div>
+                    <div style="text-align: right;">PRICE</div>
+                    <div style="text-align: right;">DISCOUNT</div>
+                    <div style="text-align: right;">TOTAL</div>
                 </div>
 
 
                 <aura:iteration items="{!group.UseCases}" var="useCase">
-<!--                    <div style="padding-left: 5px;">{!useCase.Name}</div>-->
 
                     <div class="useCasePanel">
                         <div style="padding-left: 5px;">{!useCase.Name}</div>
 
                             <aura:iteration items="{!useCase.Products}" var="prod">
                                 <div style="padding-left: 15px;">{!prod.Name}</div>
-                                <div class="dateGrid productLine">
-<!--                                    <div style="padding-left: 15px;">{!prod.Name}</div>-->
 
 
-                                    <div style="text-align: right;">
-                                        <div>QUANTITY</div>
-                                        <div>PRICE</div>
-                                        <div>DISCOUNT</div>
-                                        <div>TOTAL</div>
 
-                                    </div>
-
-                                    <aura:iteration items="{!prod.Entries}" var="entry">
+                                <div class="quoteGrid productLine">
 
 
-                                        <div>
+
+                                    <aura:iteration items="{!prod.Entries}" var="entry" indexVar="index">
+
+                                        <div style="padding-left: 15px;">{!'Year ' + (index + 1)}</div>
+
                                             <div class="value">
                                                 <lightning:input value="{!entry.Quantity}" type="number" min="0"
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
@@ -110,20 +94,21 @@
                                             <div class="value">
                                                 <lightning:formattedNumber value="{!entry.TotalPrice}" style="currency" currencyCode="GBP" />
                                             </div>
-                                        </div>
 
                                     </aura:iteration>
 
-                                    <aura:if isTrue="{!prod.Entries.length != 5}">
 
-                                        <div class="value" onclick="{!c.addProductLine}" data-id="{!prod.Id}"
-                                             data-week="{!prod.Entries.length + 1}" data-pricebookId="{!prod.PricebookEntryId}">
-                                            <div class="newValue">+</div>
-                                        </div>
-                                    </aura:if>
 
 
                                 </div>
+
+                                <aura:if isTrue="{!prod.Entries.length != 5}">
+
+                                    <div class="value" onclick="{!c.addProductLine}" data-id="{!prod.Id}"
+                                         data-week="{!prod.Entries.length + 1}" data-pricebookId="{!prod.PricebookEntryId}">
+                                        <div class="newValue">+</div>
+                                    </div>
+                                </aura:if>
 
                             </aura:iteration>
                     </div>
@@ -149,12 +134,10 @@
         </aura:iteration>
 
 
-<!--        <div class="family slds-p-around&#45;&#45;medium">-->
         <div class="family slds-p-around--small">
             <div class="dateGrid familyHeader">
                 <div>
                     <span><lightning:icon iconName="utility:groups"/></span>
-<!--                    <span>Contextual Monitoring</span>-->
                 </div>
                 <div class="value">£500,345</div>
                 <div class="value">£200,087</div>
