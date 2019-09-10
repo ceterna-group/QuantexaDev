@@ -9,47 +9,56 @@
     <aura:attribute name="useCases" type="Object[]" />
     <aura:attribute name="familyGroups" type="Object[]" />
     <aura:attribute name="productLines" type="Object[]" />
-
-<!--    <aura:attribute name="useCases" type="String[]" />-->
-<!--    <aura:attribute name="useCases" type="String[]" />-->
+    <aura:attribute name="vertical" type="Boolean" default="false"/>
 
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-<!--    <span class="slds-icon_container slds-icon-utility-announcement" title="Description of icon when needed">-->
-<!--        <svg class="slds-icon slds-icon-text-default" aria-hidden="true">-->
-<!--            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#announcement"></use>-->
-<!--        </svg>-->
-<!--        <span class="slds-assistive-text">Description of icon when needed</span>-->
-<!--    </span>-->
+
+
 
     <div class="slds-card">
+        <div style="width: 100%;display: flex;justify-content: flex-end; border-bottom: 0.5px solid grey;">
+            <div class="slds-form-element">
+                <label class="slds-checkbox_toggle slds-grid">
+                    <span class="slds-form-element__label slds-m-bottom_none">Vertical line item display:</span>
+                        <input type="checkbox" name="checkbox-toggle-13"
+                               aria-describedby="checkbox-toggle-13"  aura:id="toggle" onchange="{!c.toggleVertical}"/>
+                        <span id="checkbox-toggle-13" class="slds-checkbox_faux_container" aria-live="assertive">
+                        <span class="slds-checkbox_faux"  ></span>
+                        <span class="slds-checkbox_on">Enabled</span>
+                        <span class="slds-checkbox_off">Disabled</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
 
         <div class="slds-p-around--small">
-            CONTENT {!v.families.length} {!v.familyGroups.length}
+            QUOTE PREVIEW
 
         </div>
 
-        <div class="dateGrid slds-p-around--small" style="margin-bottom: 15px;">
-            <div class="date">DATES</div>
-            <div class="date value">YEAR 1</div>
-            <div class="date value">YEAR 2</div>
-            <div class="date value">YEAR 3</div>
-            <div class="date value">YEAR 4</div>
-            <div class="date value">YEAR 5</div>
-            <div class="date value">TOTAL</div>
-            <div class="small">COMMENCING</div>
-            <div class="small value">1 Jan 2019</div>
-            <div class="small value">1 Jan 2020</div>
-            <div class="small value">1 Jan 2021</div>
-            <div class="small value">1 Jan 2022</div>
-            <div class="small value">1 Jan 2023</div>
-<!--            <lightning:icon iconName="action:approval" alternativeText="Approved" title="this"/>-->
+        <aura:if isTrue="{!v.vertical}">
+            <div class="dateGrid slds-p-around--small" style="margin-bottom: 15px;">
+                <div class="date">DATES</div>
+                <div class="date value">YEAR 1</div>
+                <div class="date value">YEAR 2</div>
+                <div class="date value">YEAR 3</div>
+                <div class="date value">YEAR 4</div>
+                <div class="date value">YEAR 5</div>
+                <div class="date value">TOTAL</div>
+                <div class="small">COMMENCING</div>
+                <div class="small value">1 Jan 2019</div>
+                <div class="small value">1 Jan 2020</div>
+                <div class="small value">1 Jan 2021</div>
+                <div class="small value">1 Jan 2022</div>
+                <div class="small value">1 Jan 2023</div>
+            </div>
+        </aura:if>
 
-        </div>
 
 
-
-        <aura:iteration items="{!v.familyGroups}" var="group">
+        <aura:iteration items="{!v.familyGroups}" var="group" indexVar="familyIndex">
 
             <div class="family slds-p-around--small">
                 <div class="quoteGrid familyHeader">
@@ -61,7 +70,7 @@
                 </div>
 
 
-                <aura:iteration items="{!group.UseCases}" var="useCase">
+                <aura:iteration items="{!group.UseCases}" var="useCase" indexVar="useCaseIndex">
 
                     <div class="useCasePanel">
                         <div style="padding-left: 5px;">{!useCase.Name}</div>
@@ -71,44 +80,67 @@
 
 
 
-                                <div class="quoteGrid productLine">
+                                <aura:iteration items="{!prod.Entries}" var="entry" indexVar="index">
 
-
-
-                                    <aura:iteration items="{!prod.Entries}" var="entry" indexVar="index">
-
-                                        <div style="padding-left: 15px;">{!'Year ' + (index + 1)}</div>
-
+                                    <div class="quoteGrid productLine">
+                                            <div style="padding-left: 15px;">{!'YEAR ' + (index + 1)}</div>
                                             <div class="value">
                                                 <lightning:input value="{!entry.Quantity}" type="number" min="0"
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
                                             </div>
-                                            <div class="value">
-                                                <lightning:input value="{!entry.UnitPrice}" type="decimal" min="0"
+                                            <div class="value currency">
+                                                <lightning:input value="{!entry.UnitPrice}" type="currency" min="0"
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
                                             </div>
-                                            <div class="value">
-                                                <lightning:input value="" type="number" min="0"
+                                            <div class="value" style="position: relative;">
+                                                <span class="discountIcon">{!entry.DiscountPercent ? '%' : '£'}</span>
+                                                <lightning:input value="{!entry.Discount}" type="number" min="0"
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
                                             </div>
-                                            <div class="value">
+                                            <div class="value ">
                                                 <lightning:formattedNumber value="{!entry.TotalPrice}" style="currency" currencyCode="GBP" />
                                             </div>
+                                            <div style="width: 100%;display: flex;justify-content: center;">
+                                                <div style="border: 0.5px solid grey; border-radius: 4px;height: 25px;width: 25px;display:flex;justify-content: center;"
+                                                     class="hoverShow" onclick="{!c.deleteLine}">
+                                                    <lightning:icon iconName="utility:delete" size="x-small"/>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </aura:iteration>
 
-                                    </aura:iteration>
-
-
-
-
-                                </div>
 
                                 <aura:if isTrue="{!prod.Entries.length != 5}">
 
-                                    <div class="value" onclick="{!c.addProductLine}" data-id="{!prod.Id}"
-                                         data-week="{!prod.Entries.length + 1}" data-pricebookId="{!prod.PricebookEntryId}">
-                                        <div class="newValue">+</div>
+                                    <div class="quoteGrid productLine hoverShow" onclick="{!c.addProductLine}"
+                                        data-familyIndex="{!familyIndex}" data-useCaseIndex="{!useCaseIndex}">
+
+                                        <div style="padding-left: 15px;">{!'ADD YEAR ' + (prod.Entries.length + 1)}</div>
+
+                                        <div class="value">
+                                            <lightning:input value="" type="number" min="0"
+                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                        </div>
+                                        <div class="value">
+                                            <lightning:input value="" type="decimal" min="0"
+                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                        </div>
+                                        <div class="value">
+                                            <lightning:input value="" type="number" min="0"
+                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                        </div>
+                                        <div class="value">
+                                            <lightning:formattedNumber value="" style="currency" currencyCode="GBP" />
+                                        </div>
+
+                                        <div></div>
+
+
                                     </div>
+
                                 </aura:if>
+
+
 
                             </aura:iteration>
                     </div>
@@ -134,36 +166,36 @@
         </aura:iteration>
 
 
-        <div class="family slds-p-around--small">
-            <div class="dateGrid familyHeader">
-                <div>
-                    <span><lightning:icon iconName="utility:groups"/></span>
-                </div>
-                <div class="value">£500,345</div>
-                <div class="value">£200,087</div>
-                <div class="value">£167,670</div>
-                <div class="value">£145,300</div>
-                <div class="value">£143,600</div>
-                <div class="value">£546,500</div>
-            </div>
+<!--        <div class="family slds-p-around&#45;&#45;small">-->
+<!--            <div class="dateGrid familyHeader">-->
+<!--                <div>-->
+<!--                    <span><lightning:icon iconName="utility:groups"/></span>-->
+<!--                </div>-->
+<!--                <div class="value">£500,345</div>-->
+<!--                <div class="value">£200,087</div>-->
+<!--                <div class="value">£167,670</div>-->
+<!--                <div class="value">£145,300</div>-->
+<!--                <div class="value">£143,600</div>-->
+<!--                <div class="value">£546,500</div>-->
+<!--            </div>-->
 
 
-            <div class="dateGrid useCasePanel">
-                <div>AML Implementation</div>
-                <div class="value">£500,345</div>
-                <div class="value">£200,087</div>
-                <div class="value">£167,670</div>
-                <div class="value">£145,300</div>
-                <div class="value">£143,600</div>
-                <div class="value">£546,500</div>
-            </div>
+<!--            <div class="dateGrid useCasePanel">-->
+<!--                <div>AML Implementation</div>-->
+<!--                <div class="value">£500,345</div>-->
+<!--                <div class="value">£200,087</div>-->
+<!--                <div class="value">£167,670</div>-->
+<!--                <div class="value">£145,300</div>-->
+<!--                <div class="value">£143,600</div>-->
+<!--                <div class="value">£546,500</div>-->
+<!--            </div>-->
 
 
 
-            <div class="lineGrid">
+<!--            <div class="lineGrid">-->
 
-            </div>
-        </div>
+<!--            </div>-->
+<!--        </div>-->
 
 
         <div class="family newFamily slds-p-around--small dateGrid">
