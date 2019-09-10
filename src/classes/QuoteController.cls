@@ -13,8 +13,9 @@ public class QuoteController {
         Map<String,Map<String,Map<String,List<Object>>>> familyUseCaseMap = new Map<String,Map<String,Map<String,List<Object>>>>();
 
         for (OpportunityLineItem lineItem : [SELECT Id, Name, Product2.Family, Product2.Use_Case__c, Term_Years__c,
-                                                    Year__c, Product2.Product_Code__c, Product_Code__c, TotalPrice,
-                                                    Discount, UnitPrice, Product2Id, PricebookEntryId, Quantity
+                                                    Year__c, UsesAmount__c, DiscountAmount__c, Product2.Product_Code__c,
+                                                    Product_Code__c, TotalPrice, Discount, UnitPrice, Product2Id,
+                                                    PricebookEntryId, Quantity
                                             FROM OpportunityLineItem
                                             WHERE OpportunityId = :recordId
                                             ORDER BY Year__c ASC]){

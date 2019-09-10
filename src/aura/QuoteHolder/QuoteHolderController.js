@@ -59,6 +59,7 @@
                             prod.PricebookEntryId   = product.split(':')[3];
                             prod.Name               = product.split(':')[0] + ': ' + product.split(':')[1];
                             prod.Entries            = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
+                            prod.DiscountPercent    = false;
                             useCase.Products.push(prod);
 
                             prod.Entries.forEach(function (entry){
@@ -121,6 +122,38 @@
 
         $A.enqueueAction(insert);
 
+    },
+    addProductLineHorizontal : function($C,$E,$H){
+        var sourceData = $E.currentTarget.dataset;
+
+
+        console.log(sourceData.id);
+        console.log(sourceData.week);
+
+
+        // console.log(source);
+
+        var insert = $C.get('c.insertLineItem');
+        insert.setParams({
+            recordId : $C.get('v.recordId'),
+            productId : sourceData.id,
+            pricebookEntryId : sourceData.pricebookEntryId,
+            year : sourceData.week
+        });
+        insert.setCallback(this,function (response) {
+
+
+            console.log(response.getReturnValue());
+
+
+
+        });
+
+        $A.enqueueAction(insert);
+    },
+    toggleVertical : function($C,$E,$H){
+        $E.currentTarget.value = $C.get('v.vertical') === false ? 'on' : 'off';
+        $C.set('v.vertical',!$C.get('v.vertical'));
     }
 
 });

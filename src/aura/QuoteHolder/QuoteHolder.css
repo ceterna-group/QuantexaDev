@@ -113,3 +113,19 @@
     cursor: pointer;
     /*background-color: #d0cfcf;*/
 }
+
+.THIS .hoverShow {
+    opacity: 0.1;
+}
+
+
+.THIS .hoverShow:hover {
+    opacity: 1;
+}
+
+.THIS .discountIcon {
+    font-weight: bolder;
+    color: grey;
+    position: absolute;
+    left: 5px;
+}
