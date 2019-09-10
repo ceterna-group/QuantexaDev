@@ -15,13 +15,13 @@ public class QuoteController {
         for (OpportunityLineItem lineItem : [SELECT Id, Name, Product2.Family, Product2.Use_Case__c, Term_Years__c,
                                                     Year__c, UsesAmount__c, DiscountAmount__c, Product2.Product_Code__c,
                                                     Product_Code__c, TotalPrice, Discount, UnitPrice, Product2Id,
-                                                    PricebookEntryId, Quantity
+                                                    PricebookEntryId, Quantity, Product2.Name
                                             FROM OpportunityLineItem
                                             WHERE OpportunityId = :recordId
                                             ORDER BY Year__c ASC]){
 
             lineItem.Product2.Use_Case__c = lineItem.Product2.Family;
-            String productIdentifier = lineItem.Product_Code__c + ': ' + lineItem.Name + ':' + lineItem.Product2Id + ':' + lineItem.PricebookEntryId;
+            String productIdentifier = lineItem.Product_Code__c + ': ' + lineItem.Product2.Name + ':' + lineItem.Product2Id + ':' + lineItem.PricebookEntryId;
 
 
             if (!familyUseCaseMap.containsKey(lineItem.Product2.Family)){
@@ -72,8 +72,6 @@ public class QuoteController {
     @AuraEnabled
     public static OpportunityLineItem insertLineItem(String recordId, String productId, String pricebookEntryId, Integer year){
 
-        String pricebookId = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :recordId].Pricebook2Id;
-
         OpportunityLineItem newLineItem = new OpportunityLineItem();
         newLineItem.OpportunityId       = recordId;
         newLineItem.Product2Id          = productId;
@@ -82,16 +80,15 @@ public class QuoteController {
         newLineItem.Quantity            = 1;
         newLineItem.Discount            = 0;
         newLineItem.PricebookEntryId    = pricebookEntryId;
-//        newLineItem.PricebookEntryId = [SELECT Id FROM PricebookEntry WHERE Product2Id = :productId AND Id = :pricebookId].Id;
-//        newLineItem.CurrencyIsoCode = [SELECT CurrencyIsoCode FROM Opportunity WHERE Id = :recordId].CurrencyIsoCode;
-//        newLineItem.Pricebook2Id = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :recordId].Pricebook2Id;
+        newLineItem.UsesAmount__c       = false;
+        newLineItem.DiscountAmount__c   = 0;
 
         insert newLineItem;
 
-
         return [SELECT Id, Name, Product2.Family, Product2.Use_Case__c, Term_Years__c,
-                        Year__c, Product2.Product_Code__c, Product_Code__c, TotalPrice,
-                        Discount, UnitPrice
+                        Year__c, UsesAmount__c, DiscountAmount__c, Product2.Product_Code__c,
+                        Product_Code__c, TotalPrice, Discount, UnitPrice, Product2Id,
+                        PricebookEntryId, Quantity, Product2.Name
                 FROM OpportunityLineItem
                 WHERE Id = :newLineItem.Id];
 
