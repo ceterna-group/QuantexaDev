@@ -20,7 +20,7 @@
         <div style="width: 100%;display: flex;justify-content: flex-end; border-bottom: 0.5px solid grey;">
             <div class="slds-form-element">
                 <label class="slds-checkbox_toggle slds-grid">
-                    <span class="slds-form-element__label slds-m-bottom_none">Vertical line item display:</span>
+                    <span class="slds-form-element__label slds-m-bottom_none" style="display: inline;">Vertical line item display:</span>
                         <input type="checkbox" name="checkbox-toggle-13"
                                aria-describedby="checkbox-toggle-13"  aura:id="toggle" onchange="{!c.toggleVertical}"/>
                         <span id="checkbox-toggle-13" class="slds-checkbox_faux_container" aria-live="assertive">
@@ -62,48 +62,107 @@
 
             <div class="family slds-p-around--small">
                 <div class="quoteGrid familyHeader">
-                    <div>{!group.Name}</div>
+<!--                    <div>-->
+<!--                        <div style="font-size: 8px;"><lightning:icon iconName="utility:people" size="small"/>FAMILY</div>-->
+<!--                        <div>{!group.Name}</div>-->
+<!--                    </div>-->
+                    <div style="display: flex;">
+                        <div><lightning:icon iconName="utility:people" size="medium"/></div>
+                        <div style="margin-left: 5px;">
+                            <div style="font-size: 9px;font-weight: normal;">FAMILY</div>
+                            <div>{!group.Name}</div>
+                        </div>
+                    </div>
+
                     <div style="text-align: right;">QUANTITY</div>
                     <div style="text-align: right;">PRICE</div>
                     <div style="text-align: right;">DISCOUNT</div>
-                    <div style="text-align: right;">TOTAL</div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 10px;">TOTAL</div>
+                        <div>
+                            <lightning:formattedNumber style="currency" currencyCode="GBP"
+                                                       value="{!group.Total}" />
+                        </div>
+                    </div>
                 </div>
 
 
                 <aura:iteration items="{!group.UseCases}" var="useCase" indexVar="useCaseIndex">
 
                     <div class="useCasePanel">
-                        <div style="padding-left: 5px;">{!useCase.Name}</div>
+                        <div style="padding-left: 15px;margin-bottom: 20px;">
 
-                            <aura:iteration items="{!useCase.Products}" var="prod">
-                                <div style="padding-left: 15px;">{!prod.Name}</div>
+<!--                            {!useCase.Name}-->
+
+                            <div style="display: flex;">
+                                <div><lightning:icon iconName="utility:case" size="medium"/></div>
+                                <div style="margin-left: 5px;">
+                                    <div style="font-size: 9px;font-weight: normal;">USE CASE</div>
+                                    <div>{!useCase.Name}</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                            <aura:iteration items="{!useCase.Products}" var="prod" indexVar="productIndex">
+
+                                <div class="product">
 
 
 
-                                <aura:iteration items="{!prod.Entries}" var="entry" indexVar="index">
+                                <div style="padding-left: 25px;">
+<!--                                    {!prod.Name}-->
+
+                                    <div style="display: flex;">
+                                        <div><lightning:icon iconName="utility:shopping_bag" size="medium"/></div>
+                                        <div style="margin-left: 5px;">
+                                            <div style="font-size: 9px;font-weight: normal;">PRODUCT</div>
+                                            <div>{!prod.Name}</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+                                <aura:iteration items="{!prod.Entries}" var="entry" indexVar="entryIndex">
 
                                     <div class="quoteGrid productLine">
-                                            <div style="padding-left: 15px;">{!'YEAR ' + (index + 1)}</div>
+                                            <div style="padding-right: 10px;width: 100%;text-align: right;">{!'YEAR ' + (entryIndex + 1)}</div>
                                             <div class="value">
                                                 <lightning:input value="{!entry.Quantity}" type="number" min="0"
                                                                  variant="label-hidden" style="max-width:100px;text-align:right;"/>
                                             </div>
                                             <div class="value currency">
                                                 <lightning:input value="{!entry.UnitPrice}" type="currency" min="0"
-                                                                 variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                                                 variant="label-hidden" style="max-width:100px;text-align:right;" />
                                             </div>
                                             <div class="value" style="position: relative;">
-                                                <span class="discountIcon">{!entry.DiscountPercent ? '%' : '£'}</span>
-                                                <lightning:input value="{!entry.Discount}" type="number" min="0"
-                                                                 variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                                <span class="discountIcon" onclick="{!c.setUsesAmount}"
+                                                      data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
+                                                      data-id="{!prod.Id}" data-pricebookid="{!prod.PricebookEntryId}" data-entryindex="{!entryIndex}">
+                                                    {!entry.UsesAmount__c ? '£' : '%'}</span>
+                                                <aura:if isTrue="{!entry.UsesAmount__c}">
+                                                    <lightning:input value="{!entry.DiscountAmount__c}" type="number" min="0"
+                                                                     variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                                    <aura:set attribute="else">
+                                                        <lightning:input value="{!entry.Discount}" type="number" min="0"
+                                                                         variant="label-hidden" style="max-width:100px;text-align:right;"/>
+
+                                                    </aura:set>
+                                                </aura:if>
+
+
                                             </div>
                                             <div class="value ">
-                                                <lightning:formattedNumber value="{!entry.TotalPrice}" style="currency" currencyCode="GBP" />
+<!--                                                <lightning:formattedNumber value="{!entry.TotalPrice}" style="currency" currencyCode="GBP" />-->
+                                                <lightning:formattedNumber style="currency" currencyCode="GBP"
+                                                                           value="{!entry.UnitPrice * entry.Quantity -
+                                                                           (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0)}" />
                                             </div>
                                             <div style="width: 100%;display: flex;justify-content: center;">
-                                                <div style="border: 0.5px solid grey; border-radius: 4px;height: 25px;width: 25px;display:flex;justify-content: center;"
-                                                     class="hoverShow" onclick="{!c.deleteLine}">
-                                                    <lightning:icon iconName="utility:delete" size="x-small"/>
+                                                <div class="hoverShow hoverLight" onclick="{!c.deleteLine}">
+                                                    <lightning:icon iconName="utility:delete" size="small"/>
                                                 </div>
                                             </div>
                                     </div>
@@ -112,49 +171,65 @@
 
                                 <aura:if isTrue="{!prod.Entries.length != 5}">
 
-                                    <div class="quoteGrid productLine hoverShow" onclick="{!c.addProductLine}"
-                                        data-familyIndex="{!familyIndex}" data-useCaseIndex="{!useCaseIndex}">
 
-                                        <div style="padding-left: 15px;">{!'ADD YEAR ' + (prod.Entries.length + 1)}</div>
+
+                                    <div class="quoteGrid productLine hoverShow" onclick="{!c.addProductLineHorizontal}"
+                                         data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
+                                         data-id="{!prod.Id}" data-week="{!prod.Entries.length + 1}"
+                                         data-pricebookid="{!prod.PricebookEntryId}">
+
+                                        <div style="padding-right: 10px;width: 100%;text-align: right;">{!'YEAR ' + (prod.Entries.length + 1)}</div>
 
                                         <div class="value">
-                                            <lightning:input value="" type="number" min="0"
-                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                            <lightning:input value="" type="number" disabled="true" style="max-width:100px;"/>
                                         </div>
                                         <div class="value">
-                                            <lightning:input value="" type="decimal" min="0"
-                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                            <lightning:input value="" type="decimal" disabled="true" style="max-width:100px;"/>
                                         </div>
                                         <div class="value">
-                                            <lightning:input value="" type="number" min="0"
-                                                             variant="label-hidden" style="max-width:100px;text-align:right;"/>
+                                            <lightning:input value="" type="number" disabled="true" style="max-width:100px;"/>
                                         </div>
-                                        <div class="value">
-                                            <lightning:formattedNumber value="" style="currency" currencyCode="GBP" />
-                                        </div>
-
-                                        <div></div>
-
-
                                     </div>
 
                                 </aura:if>
 
-
+                                </div>
 
                             </aura:iteration>
                     </div>
                 </aura:iteration>
 
 <!--                <div class="useCasePanel">-->
-                    <div>
-                        <div class="newUseCase">
-                        <lightning:select label="" variant="label-hidden" >
-                            <option></option>
-                            <aura:iteration items="{!v.useCases}" var="case" indexVar="index">
-                                <option value="{!case}">{!case}</option>
-                            </aura:iteration>
-                        </lightning:select>
+                <div>
+                    <div class="newUseCase" style="cursor:pointer;">
+
+                        <div style="display: flex;padding-left: 15px;margin-top:5px;">
+                            <div><lightning:icon iconName="utility:case" size="medium"/></div>
+                            <div style="margin-left: 5px;">
+                                <div style="font-size: 9px;font-weight: normal;">NEW USE CASE</div>
+                                <div>
+<!--                                    Add new-->
+
+                                    <lightning:select label="" variant="label-hidden" >
+                                        <option></option>
+                                        <aura:iteration items="{!v.useCases}" var="case" indexVar="index">
+                                            <option value="{!case}">{!case}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+<!--                        <lightning:select label="" variant="label-hidden" >-->
+<!--                            <option></option>-->
+<!--                            <aura:iteration items="{!v.useCases}" var="case" indexVar="index">-->
+<!--                                <option value="{!case}">{!case}</option>-->
+<!--                            </aura:iteration>-->
+<!--                        </lightning:select>-->
                     </div>
 
                 </div>
