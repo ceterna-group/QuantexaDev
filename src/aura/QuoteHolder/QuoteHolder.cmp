@@ -5,22 +5,19 @@
                 implements="force:hasRecordId,flexipage:availableForRecordHome">
     <aura:attribute name="families" type="Object[]" />
     <aura:attribute name="useCases" type="Object[]" />
+<!--    <aura:attribute name="dependencies" type="Object[]" />-->
     <aura:attribute name="familyGroups" type="Object[]" />
     <aura:attribute name="productLines" type="Object[]" />
     <aura:attribute name="vertical" type="Boolean" default="false"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-
     <div class="slds-card">
-
         <lightning:icon iconName="utility:people" size="medium"/>
-
-
         <div style="width: 100%;display: flex;justify-content: flex-end; border-bottom: 0.5px solid grey;">
             <div class="slds-form-element">
                 <label class="slds-checkbox_toggle slds-grid">
                     <span class="slds-form-element__label slds-m-bottom_none" style="display: inline;">Vertical line item display:</span>
                     <input type="checkbox" name="checkbox-toggle-13"
-                           aria-describedby="checkbox-toggle-13"  aura:id="toggle" onchange="{!c.toggleVertical}"/>
+                           aria-describedby="checkbox-toggle-13"  onchange="{!c.toggleVertical}"/>
                     <span id="checkbox-toggle-13" class="slds-checkbox_faux_container" aria-live="assertive">
             <span class="slds-checkbox_faux"  ></span>
             <span class="slds-checkbox_on">Enabled</span>
@@ -29,8 +26,8 @@
                 </label>
             </div>
         </div>
-        <div class="slds-p-around--small">
-            QUOTE PREVIEW
+        <div class="slds-p-around--small" style="font-size: 20px;">
+            QUOTE PREVIEW <span style="padding-left: 3px;padding-right: 3px;color:white;background-color: grey;border-radius: 4px;" >IN DEVELOPMENT</span>
         </div>
         <aura:if isTrue="{!v.vertical}">
             <div class="dateGrid slds-p-around--small" style="margin-bottom: 15px;">
@@ -64,6 +61,7 @@
                     <div style="text-align: right;"></div>
                     <div style="text-align: right;"></div>
                     <div style="text-align: right;"></div>
+                    <div style="text-align: right;"></div>
                     <div style="text-align: right;padding-right: 6px;">
                         <div style="font-size: 9px;">FAMILY TOTAL</div>
                         <div  style="font-weight: bold;">
@@ -74,7 +72,6 @@
                 </div>
                 <aura:iteration items="{!group.UseCases}" var="useCase" indexVar="useCaseIndex">
                     <div class="useCasePanel">
-
                         <div class="quoteGrid familyHeader">
                             <div style="padding-left: 15px;margin-bottom: 20px;">
                                 <div style="display: flex;">
@@ -90,20 +87,19 @@
                             <div style="text-align: right;"></div>
                             <div style="text-align: right;"></div>
                             <div style="text-align: right;"></div>
+                            <div style="text-align: right;"></div>
                             <div style="text-align: right;padding-right: 6px;">
                                 <div style="font-size: 9px;">USE CASE TOTAL</div>
                                 <div>
                                     <lightning:formattedNumber style="currency" currencyCode="GBP"
-                                                               value="{!group.Total}" />
+                                                               value="{!useCase.Total}" />
                                 </div>
                             </div>
                         </div>
-
                         <aura:iteration items="{!useCase.Products}" var="prod" indexVar="productIndex">
                             <div class="product">
-
                                 <div class="quoteGrid familyHeader">
-                                    <div style="padding-left: 30px;margin-bottom: 20px;">
+                                    <div style="padding-left: 23px;margin-bottom: 20px;">
                                         <div style="display: flex;">
                                             <div>
                                                 <lightning:icon iconName="utility:custom_apps" size="small"/>
@@ -114,6 +110,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div style="text-align: right;font-size: 10px;padding-right: 8px;">DATE</div>
                                     <div style="text-align: right;font-size: 10px;padding-right: 8px;">QUANTITY</div>
                                     <div style="text-align: right;font-size: 10px;padding-right: 8px;">PRICE</div>
                                     <div style="text-align: right;font-size: 10px;padding-right: 8px;">DISCOUNT</div>
@@ -127,10 +124,10 @@
                                 </div>
                                 <aura:iteration items="{!prod.Entries}" var="entry" indexVar="entryIndex">
                                     <div class="quoteGrid productLine">
-<!--                                        <div style="padding-right: 10px;width: 100%;text-align: right;">{!'YEAR ' + (entryIndex + 1)}</div>-->
-                                        <div style="padding-right: 10px;width: 100%;padding-left: 75px;">
-                                            {!'Year ' + (entryIndex + 1) + ' commencing...'}
+                                        <div style="padding-right: 10px;width: 100%;padding-left: 52px;">
+                                            {!'Year ' + (entryIndex + 1)}
                                         </div>
+                                        <div></div>
                                         <div class="value">
                                             <lightning:input value="{!entry.Quantity}" type="number" min="0"
                                                              variant="label-hidden" style="max-width:80px;text-align:right;"/>
@@ -140,28 +137,46 @@
                                                              variant="label-hidden" style="max-width:80px;text-align:right;" />
                                         </div>
                                         <div class="value" style="position: relative;">
-                                 <span class="discountIcon" onclick="{!c.setUsesAmount}"
-                                       data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
-                                       data-id="{!prod.Id}" data-pricebookid="{!prod.PricebookEntryId}" data-entryindex="{!entryIndex}">
-                                            {!entry.UsesAmount__c ? '£' : '%'}</span>
+<!--                                             <span class="discountIcon" onclick="{!entry.UsesAmount__c ? c.setDiscountToPercent : setDiscountToAmount}"-->
+                                             <span class="discountIcon" onclick="{!entry.UsesAmount__c ? c.setDiscountToPercent : c.setDiscountToAmount}"
+                                                   data-familyindex="{!familyIndex}" data-entry="{!entry}"
+                                                   data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
+                                                   data-entryindex="{!entryIndex}" data-usesamount="{!entry.UsesAmount__c}">
+                                                 <aura:if isTrue="{!entry.UsesAmount__c}">£</aura:if>
+                                                 <aura:if isTrue="{!not(entry.UsesAmount__c)}">%</aura:if>
+<!--                                                    {!entry.UsesAmount__c ? '£' : '%'}-->
+<!--                                                    {!entry.UsesAmount__c ? '£' : '%'}-->
+                                             </span>
                                             <aura:if isTrue="{!entry.UsesAmount__c}">
-                                                <lightning:input value="{!entry.DiscountAmount__c}" type="number" min="0"
-                                                                 variant="label-hidden" style="max-width:90px;text-align:right;"/>
-                                                <aura:set attribute="else">
-                                                    <lightning:input value="{!entry.Discount}" type="number" min="0"
+                                                <span onkeyup="{!c.calculateDiscountPercent}"
+                                                      data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}"
+                                                      data-productindex="{!productIndex}"
+                                                      data-id="{!prod.Id}" data-entryindex="{!entryIndex}">
+                                                    <lightning:input value="{!entry.DiscountAmount__c}" type="number" min="0"
                                                                      variant="label-hidden" style="max-width:90px;text-align:right;"/>
+                                                </span>
+                                                <aura:set attribute="else">
+                                                    <span onkeyup="{!c.calculateDiscountAmount}"
+                                                          data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}"
+                                                          data-productindex="{!productIndex}"
+                                                          data-id="{!prod.Id}" data-entryindex="{!entryIndex}">
+                                                        <lightning:input value="{!entry.Discount}" type="number" min="0"
+                                                                         variant="label-hidden" style="max-width:90px;text-align:right;"/>
+                                                    </span>
                                                 </aura:set>
                                             </aura:if>
                                         </div>
                                         <div class="value ">
-                                            <!--                                                <lightning:formattedNumber value="{!entry.TotalPrice}" style="currency" currencyCode="GBP" />-->
                                             <lightning:formattedNumber style="currency" currencyCode="GBP"
                                                                        value="{!entry.UnitPrice * entry.Quantity -
-                                                                         (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0)}" />
+                                    (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0)}" />
                                         </div>
                                         <div style="width: 100%;display: flex;justify-content: center;">
                                             <aura:if isTrue="{!entryIndex == (prod.Entries.length -1)}">
-                                                <div class="hoverShow hoverLight" onclick="{!c.deleteLine}">
+                                                <div class="hoverShow hoverLight" onclick="{!c.deleteLine}"
+                                                     data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}"
+                                                     data-productindex="{!productIndex}" data-id="{!prod.Id}"
+                                                     data-entryid="{!entry.Id}" data-entryindex="{!entryIndex}">
                                                     <lightning:icon iconName="utility:delete" size="small"/>
                                                 </div>
                                             </aura:if>
@@ -169,12 +184,11 @@
                                     </div>
                                 </aura:iteration>
                                 <aura:if isTrue="{!prod.Entries.length &lt; 5}">
-                                    <div class="quoteGrid productLine hoverShow" onclick="{!c.addProductLineHorizontal}"
+                                    <div class="quoteGrid productLine hoverShow" onclick="{!c.addProductLine}"
                                          data-familyindex="{!familyIndex}" data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
                                          data-id="{!prod.Id}" data-week="{!prod.Entries.length + 1}"
                                          data-pricebookid="{!prod.PricebookEntryId}">
-<!--                                        <div style="padding-right: 10px;width: 100%;text-align: right;">{!'YEAR ' + (prod.Entries.length + 1)}</div>-->
-                                        <div style="padding-right: 10px;width: 100%;padding-left: 75px;">{!'Year ' + (prod.Entries.length + 1)}</div>
+                                        <div style="padding-right: 10px;width: 100%;padding-left: 52px;">{!'Year ' + (prod.Entries.length + 1)}</div>
                                         <div class="value">
                                             <lightning:input value="" type="number" disabled="true" style="max-width:80px;"/>
                                         </div>
@@ -190,36 +204,36 @@
                         </aura:iteration>
                     </div>
                 </aura:iteration>
-                <div>
-                    <div class="newUseCase" style="cursor:pointer;">
-                        <div style="display: flex;padding-left: 15px;margin-top:5px;">
-                            <div>
-                                <lightning:icon iconName="utility:case" size="medium"/>
-                            </div>
-                            <div style="margin-left: 5px;">
-                                <div style="font-size: 9px;font-weight: normal;">NEW USE CASE</div>
+                <aura:if isTrue="{!group.Dependencies.length != 0}">
+
+                    <div>
+                        <div class="newUseCase" style="cursor:pointer;">
+                            <div style="display: flex;padding-left: 15px;margin-top:5px;">
                                 <div>
-<!--                                    <lightning:select label="" variant="label-hidden" onchange="{!c.addUseCase}">-->
-                                    <select label="" variant="label-hidden" onchange="{!c.addUseCase}" data-familyindex="{!familyIndex}" >
-                                        <option></option>
-                                        <aura:iteration items="{!v.useCases}" var="case" indexVar="index">
-                                            <option value="{!case}" >{!case}</option>
-                                        </aura:iteration>
-<!--                                    </lightning:select>-->
-                                    </select>
+                                    <lightning:icon iconName="utility:case" size="medium"/>
+                                </div>
+                                <div style="margin-left: 5px;">
+                                    <div style="font-size: 9px;font-weight: normal;">NEW USE CASE</div>
+                                    <div>
+                                        <select label="" variant="label-hidden" onchange="{!c.addUseCase}" data-familyindex="{!familyIndex}" >
+                                            <option></option>
+                                            <aura:iteration items="{!group.Dependencies}" var="case" indexVar="index">
+                                                <option value="{!case}" >{!case}</option>
+                                            </aura:iteration>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                </aura:if>
+
             </div>
         </aura:iteration>
-
         <lightning:icon iconName="utility:people" size="medium"/>
-
-
-<!--        <div class="family slds-p-around&#45;&#45;small newFamily">-->
-<!--            <div class="quoteGrid familyHeader">-->
+        <!--        <div class="family slds-p-around&#45;&#45;small newFamily">-->
+        <!--            <div class="quoteGrid familyHeader">-->
         <div style="{!'display:' + (v.families.length == 0 ? 'none;' : '')}">
             <div>
                 <div style="display: flex;">
@@ -229,7 +243,6 @@
                     <div style="margin-left: 5px;">
                         <div style="font-size: 9px;font-weight: normal;">NEW FAMILY</div>
                         <div style="font-weight: bold;">
-
                             <div class="">
                                 <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"
                                        onchange="{!c.createFamily}" placeholder="New Product Family..."/>
@@ -239,66 +252,57 @@
                                     </aura:iteration>
                                 </datalist>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
-<!--                <div style="text-align: right;"></div>-->
-<!--                <div style="text-align: right;"></div>-->
-<!--                <div style="text-align: right;"></div>-->
-<!--                <div style="text-align: right;padding-right: 6px;">-->
-<!--                    <div style="font-size: 9px;">FAMILY TOTAL</div>-->
-<!--                    <div  style="font-weight: bold;">-->
-<!--                        <lightning:formattedNumber style="currency" currencyCode="GBP"-->
-<!--                                                   value="{!group.Total}" />-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                <div style="text-align: right;"></div>-->
+                <!--                <div style="text-align: right;"></div>-->
+                <!--                <div style="text-align: right;"></div>-->
+                <!--                <div style="text-align: right;padding-right: 6px;">-->
+                <!--                    <div style="font-size: 9px;">FAMILY TOTAL</div>-->
+                <!--                    <div  style="font-weight: bold;">-->
+                <!--                        <lightning:formattedNumber style="currency" currencyCode="GBP"-->
+                <!--                                                   value="{!group.Total}" />-->
+                <!--                    </div>-->
+                <!--                </div>-->
             </div>
         </div>
-
-
         <div class="family newFamily ">
-
-<!--            <div class="newUseCase" style="cursor:pointer;">-->
-<!--                <div style="display: flex;padding-left: 15px;margin-top:5px;">-->
-<!--                    <div>-->
-<!--                        <lightning:icon iconName="utility:case" size="medium"/>-->
-<!--                    </div>-->
-<!--                    <div style="margin-left: 5px;">-->
-<!--                        <div style="font-size: 9px;font-weight: normal;">NEW FAMILY</div>-->
-
-<!--                        <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"-->
-<!--                               onchange="{!c.createFamily}" placeholder="New Product Family..."/>-->
-<!--                        <datalist id="{!v.recordId}">-->
-<!--                            <aura:iteration items="{!v.families}" var="family" indexVar="index">-->
-<!--                                <option value="{!family}">{!family}</option>-->
-<!--                            </aura:iteration>-->
-<!--                        </datalist>-->
-
-
-<!--&lt;!&ndash;                        <div style="font-size: 9px;font-weight: normal;">NEW USE CASE</div>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <lightning:select label="" variant="label-hidden" >&ndash;&gt;-->
-<!--&lt;!&ndash;                                <option></option>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <aura:iteration items="{!v.useCases}" var="case" indexVar="index">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <option value="{!case}">{!case}</option>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </aura:iteration>&ndash;&gt;-->
-<!--&lt;!&ndash;                            </lightning:select>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="">-->
-<!--                <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"-->
-<!--                       onchange="{!c.createFamily}" placeholder="New Product Family..."/>-->
-<!--                <datalist id="{!v.recordId}">-->
-<!--                    <aura:iteration items="{!v.families}" var="family" indexVar="index">-->
-<!--                        <option value="{!family}">{!family}</option>-->
-<!--                    </aura:iteration>-->
-<!--                </datalist>-->
-<!--            </div>-->
+            <!--            <div class="newUseCase" style="cursor:pointer;">-->
+            <!--                <div style="display: flex;padding-left: 15px;margin-top:5px;">-->
+            <!--                    <div>-->
+            <!--                        <lightning:icon iconName="utility:case" size="medium"/>-->
+            <!--                    </div>-->
+            <!--                    <div style="margin-left: 5px;">-->
+            <!--                        <div style="font-size: 9px;font-weight: normal;">NEW FAMILY</div>-->
+            <!--                        <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"-->
+            <!--                               onchange="{!c.createFamily}" placeholder="New Product Family..."/>-->
+            <!--                        <datalist id="{!v.recordId}">-->
+            <!--                            <aura:iteration items="{!v.families}" var="family" indexVar="index">-->
+            <!--                                <option value="{!family}">{!family}</option>-->
+            <!--                            </aura:iteration>-->
+            <!--                        </datalist>-->
+            <!--&lt;!&ndash;                        <div style="font-size: 9px;font-weight: normal;">NEW USE CASE</div>&ndash;&gt;-->
+            <!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+            <!--&lt;!&ndash;                            <lightning:select label="" variant="label-hidden" >&ndash;&gt;-->
+            <!--&lt;!&ndash;                                <option></option>&ndash;&gt;-->
+            <!--&lt;!&ndash;                                <aura:iteration items="{!v.useCases}" var="case" indexVar="index">&ndash;&gt;-->
+            <!--&lt;!&ndash;                                    <option value="{!case}">{!case}</option>&ndash;&gt;-->
+            <!--&lt;!&ndash;                                </aura:iteration>&ndash;&gt;-->
+            <!--&lt;!&ndash;                            </lightning:select>&ndash;&gt;-->
+            <!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
+            <!--            <div class="">-->
+            <!--                <input class="slds-input sldsInput" aura:id="codelistInput" id="codelistInput"  name="codelistInput"-->
+            <!--                       onchange="{!c.createFamily}" placeholder="New Product Family..."/>-->
+            <!--                <datalist id="{!v.recordId}">-->
+            <!--                    <aura:iteration items="{!v.families}" var="family" indexVar="index">-->
+            <!--                        <option value="{!family}">{!family}</option>-->
+            <!--                    </aura:iteration>-->
+            <!--                </datalist>-->
+            <!--            </div>-->
         </div>
     </div>
 </aura:component>
