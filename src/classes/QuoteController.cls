@@ -18,7 +18,7 @@ public class QuoteController {
                                                     PricebookEntryId, Quantity, Product2.Name
                                             FROM OpportunityLineItem
                                             WHERE OpportunityId = :recordId
-                                            ORDER BY Year__c ASC]){
+                                            ORDER BY Product2.Family, Product2.Use_Case__c, Year__c ASC]){
 
             String productIdentifier = lineItem.Product_Code__c + ': ' + lineItem.Product2.Name + ':' + lineItem.Product2Id + ':' + lineItem.PricebookEntryId;
 

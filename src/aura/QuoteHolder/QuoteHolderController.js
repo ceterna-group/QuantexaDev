@@ -14,6 +14,12 @@
 
             if (response.getState() === 'SUCCESS'){
 
+                var dependencies = {};
+                Object.keys(response.getReturnValue()['DEPENDENCIES']).forEach(function(dependency){
+                    dependencies[dependency] = response.getReturnValue()['DEPENDENCIES'][dependency];
+                });
+
+                $C.set('v.dependencies',dependencies);
                 $C.set('v.families',response.getReturnValue()['FAMILIES']);
                 $C.set('v.useCases',response.getReturnValue()['USECASES']);
 
@@ -53,9 +59,10 @@
                             prod.Id                 = product.split(':')[2];
                             prod.PricebookEntryId   = product.split(':')[3];
                             prod.Name               = product.split(':')[1];
+                            prod.Total              = 0;
+                            prod.Success            = '';
                             prod.Entries            = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
                             prod.DiscountPercent    = false;
-                            useCase.Products.push(prod);
 
                             prod.Entries.forEach(function (entry){
                                 if (entry.Year__c){
@@ -63,9 +70,13 @@
                                     family.Total += entry.TotalPrice;
                                     useCase['Year' + entry.Year__c] += entry.TotalPrice;
                                     useCase.Total += entry.TotalPrice;
+                                    prod.Total += entry.TotalPrice;
                                 }
                                console.log(entry);
                             });
+
+                            useCase.Products.push(prod);
+
                         });
 
                         family.UseCases.push(useCase);
@@ -76,19 +87,17 @@
                 $C.set('v.familyGroups',familyGroups);
                 $C.set('v.productLines',productLines);
 
+                $C.set('v.finishedLoad',true);
                 console.log(familyGroups);
-
             }
-
-
         });
         $A.enqueueAction(getInfo);
-
     },
     createFamily : function($C,$E,$H){
 
-        var familyName  = $C.find('codelistInput').getElement().value;
-        var familyGroups = $C.get('v.familyGroups');
+        var familyName      = $C.find('codelistInput').getElement().value;
+        var familyGroups    = $C.get('v.familyGroups');
+
         var family      = {};
         family.Name     = familyName;
         family.Year1    = 0;
@@ -98,6 +107,7 @@
         family.Year5    = 0;
         family.Total    = 0;
         family.UseCases = [];
+        family.Dependencies = $C.get('v.dependencies')[familyName];
         familyGroups.push(family);
 
         $C.set('v.familyGroups',familyGroups);
@@ -115,7 +125,8 @@
     addUseCase : function($C,$E,$H){
 
         var sourceData      = $E.currentTarget.dataset;
-        var useCaseName     = $E.currentTarget.value;
+        var useCaseName     = $E.currentTarget.value.split(':')[0];
+        var useCaseIndex    = $E.currentTarget.value.split(':')[1];
         var familyGroups    = $C.get('v.familyGroups');
 
         var useCase         = {};
@@ -129,6 +140,7 @@
         useCase.Products    = [];
 
         familyGroups[sourceData.familyindex].UseCases.push(useCase);
+        familyGroups[sourceData.familyindex].Dependencies.splice(useCaseIndex, 1);
 
         $C.set('v.familyGroups',familyGroups);
 
@@ -139,66 +151,58 @@
             familyName : familyGroups[sourceData.familyindex].Name
         });
         insert.setCallback(this,function (response) {
-            console.log(response.getReturnValue());
-
-
             if (response.getState() === 'SUCCESS'){
+                Object.keys(response.getReturnValue()['USECASEMAP'][useCaseName]).forEach(function (product){
+                    var prod        = {};
+                    prod.Family             = familyGroups[sourceData.familyindex].Name;
+                    prod.UseCase            = useCaseName;
+                    prod.Id                 = product.split(':')[2];
+                    prod.PricebookEntryId   = product.split(':')[3];
+                    prod.Name               = product.split(':')[1];
+                    prod.Total              = 0;
+                    prod.Entries            = response.getReturnValue()['USECASEMAP'][useCaseName][product];
+                    prod.DiscountPercent    = false;
+
+                    prod.Entries.forEach(function (entry){
+                        entry.Success = 'success';
+                        if (entry.Year__c){
+                            familyGroups[sourceData.familyindex]['Year' + entry.Year__c] += entry.TotalPrice;
+                            familyGroups[sourceData.familyindex].Total += entry.TotalPrice;
+                            useCase['Year' + entry.Year__c] += entry.TotalPrice;
+                            useCase.Total += entry.TotalPrice;
+                        }
 
 
-                // var initAction = $C.get('c.doInit');
-                // $A.enqueueAction(initAction);
+                    });
+                    useCase.Products.push(prod);
+                });
 
-                // response.getReturnValue().forEach(function (product){
-                //
-                //
-                //
-                // });
-                // var prod        = {};
-                // prod.Family             = group;
-                // prod.UseCase            = caseName;
-                // prod.Id                 = product.split(':')[2];
-                // prod.PricebookEntryId   = product.split(':')[3];
-                // prod.Name               = product.split(':')[1];
-                // prod.Entries            = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
-                // prod.DiscountPercent    = false;
-                // useCase.Products.push(prod);
-                //
-                // prod.Entries.forEach(function (entry){
-                //     if (entry.Year__c){
-                //         family['Year' + entry.Year__c] += entry.TotalPrice;
-                //         family.Total += entry.TotalPrice;
-                //         useCase['Year' + entry.Year__c] += entry.TotalPrice;
-                //         useCase.Total += entry.TotalPrice;
-                //     }
-                //     console.log(entry);
-                // });
-                //
-                // // familyGroups[sourceData.familyindex].UseCases[familyIndex -2].Products[sourceData.productindex].Entries = response.getReturnValue();
-                //
-                // $C.set('v.familyGroups',familyGroups);
+                familyGroups[sourceData.familyindex].UseCases[sourceData.familyIndex - 1] = useCase;
+                $C.set('v.familyGroups',familyGroups);
+
+                window.setTimeout(
+                    $A.getCallback(function() {
+                        familyGroups[sourceData.familyindex].UseCases[sourceData.familyIndex - 1].Products.forEach(function(prod){
+                            prod.Entries.forEach(function(entry){
+                                entry.Success = '';
+                            });
+                        });
+
+                        $C.set('v.familyGroups',familyGroups);
+                    }), 800
+                );
             }
-
         });
 
         $A.enqueueAction(insert);
-
-        console.log($E.currentTarget.value);
+    },
+    updateLine : function($C,$E,$H){
 
     },
-
     addProductLine : function($C,$E,$H){
-        var sourceData = $E.currentTarget.dataset;
-
-        console.log(Object.keys(sourceData));
-        console.log(Object.values(sourceData));
-        console.log(sourceData.week);
-
-
-        var familyGroups = $C.get('v.familyGroups');
-
-        console.log('length si ' + familyGroups.length + ' and index is ' + sourceData.familyindex);
-
-        var newLineItem = {
+        var sourceData      = $E.currentTarget.dataset;
+        var familyGroups    = $C.get('v.familyGroups');
+        var newLineItem     = {
             Quantity: 1,
             TotalPrice: 0,
             UnitPrice: 0,
@@ -206,6 +210,7 @@
         };
 
         familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries.push(newLineItem);
+
         $C.set('v.familyGroups',familyGroups);
 
         var insert = $C.get('c.insertLineItem');
@@ -213,18 +218,20 @@
             recordId : $C.get('v.recordId'),
             productId : sourceData.id,
             pricebookEntryId : sourceData.pricebookid,
-            year : sourceData.week
+            year : sourceData.week + 1
         });
         insert.setCallback(this,function (response) {
-
-
-            familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.week -2] = response.getReturnValue();
-
-            console.log(response.getReturnValue());
-
+            var length      = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries.length;
+            var product     = response.getReturnValue();
+            product.Success = 'success';
+            familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1] = product;
             $C.set('v.familyGroups',familyGroups);
-
-
+            window.setTimeout(
+                $A.getCallback(function() {
+                    familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1].Success = '';
+                    $C.set('v.familyGroups',familyGroups);
+                }), 800
+            );
         });
 
         $A.enqueueAction(insert);
@@ -289,5 +296,8 @@
         $E.currentTarget.value = $C.get('v.vertical') === false ? 'on' : 'off';
         $C.set('v.vertical',!$C.get('v.vertical'));
     }
+
+
+
 
 });

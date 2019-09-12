@@ -15,30 +15,25 @@
     border: 1px solid #dad9d9;
     border-radius: 3px;
     margin-bottom: 12px;
-    /*background-color: #f9f7f7;*/
 }
 
 .THIS .familyHeader {
     font-size: 14px;
-    /*font-weight: bold;*/
 }
-
-
 
 .THIS .dateGrid {
     display: grid;
-    grid-template-columns: 22% 13% 13% 13% 13% 13% 13%;
+    /*grid-template-columns: 22% 13% 13% 13% 13% 13% 13%;*/
+    grid-template-columns: 15% 16% 16% 16% 16% 16% 5%;
+    height: 150px;
 }
 
 .THIS .quoteGrid {
     display: grid;
-    /*grid-template-columns: 31% 16% 16% 16% 16% 5%;*/
     grid-template-columns: 15% 16% 16% 16% 16% 16% 5%;
 }
 
 .THIS .value {
-    /*text-align: right;*/
-    /*padding-right: 5px;*/
     display: flex;
     justify-content: flex-end;
     padding-right: 5px;
@@ -47,11 +42,9 @@
 .THIS .useCasePanel {
     padding-top: 10px;
     margin-top: 5px;
-    /*border-bottom: 0.5px solid lightgrey;*/
     border-top: 0.5px solid lightgrey;
     padding-bottom: 5px;
     margin-bottom: 20px;
-    /*font-weight: lighter;*/
 }
 
 .THIS .newUseCase {
@@ -121,12 +114,19 @@
 
 .THIS .productLine {
     padding-top: 4px;
-    height:40px;
+    /*padding-bottom: 2px;*/
     cursor: pointer;
+    transition: background-color 2s;
+    -webkit-transition: background-color 2s;
+    position: relative;
 }
 
 .THIS .productLine:hover {
     background-color: #f1f1f1;
+}
+
+.THIS .productLineHorizontal {
+    height:40px;
 }
 
 .THIS .hoverShow {
@@ -164,4 +164,21 @@
 
 .THIS .slds-form-element__label {
     display: none;
+}
+
+.THIS .success {
+    background-color: #a6eebc;
+}
+
+.THIS .verticalLabel {
+    width: 100%;
+    padding-right: 5px;
+    text-align: right;
+    font-size: 11px;
+}
+
+.THIS .verticalRow {
+    height: 25px;
+    margin-top: 8px;
+
 }
