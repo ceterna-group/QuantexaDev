@@ -114,7 +114,6 @@
 
 .THIS .productLine {
     padding-top: 4px;
-    /*padding-bottom: 2px;*/
     cursor: pointer;
     transition: background-color 2s;
     -webkit-transition: background-color 2s;
@@ -168,6 +167,19 @@
 
 .THIS .success {
     background-color: #a6eebc;
+}
+
+.THIS .successInput input {
+    background-color: #a6eebc;
+}
+
+.THIS .fade {
+    transition: background-color 2s !important;
+    -webkit-transition: background-color 2s !important;
+}
+
+.THIS .pending {
+    opacity : 0.4;
 }
 
 .THIS .verticalLabel {

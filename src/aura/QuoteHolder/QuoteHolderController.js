@@ -27,9 +27,6 @@
                 var productLines = [];
 
                 Object.keys(response.getReturnValue()['FAMILYGROUPS']).forEach(function(group){
-
-                    console.log('processing ' + group);
-
                     var family      = {};
                     family.Name     = group;
                     family.Year1    = 0;
@@ -63,32 +60,16 @@
                             prod.Success            = '';
                             prod.Entries            = response.getReturnValue()['FAMILYGROUPS'][group][caseName][product];
                             prod.DiscountPercent    = false;
-
-                            prod.Entries.forEach(function (entry){
-                                if (entry.Year__c){
-                                    family['Year' + entry.Year__c] += entry.TotalPrice;
-                                    family.Total += entry.TotalPrice;
-                                    useCase['Year' + entry.Year__c] += entry.TotalPrice;
-                                    useCase.Total += entry.TotalPrice;
-                                    prod.Total += entry.TotalPrice;
-                                }
-                               console.log(entry);
-                            });
-
                             useCase.Products.push(prod);
-
                         });
-
                         family.UseCases.push(useCase);
                     });
-
                     familyGroups.push(family);
                 });
                 $C.set('v.familyGroups',familyGroups);
                 $C.set('v.productLines',productLines);
-
                 $C.set('v.finishedLoad',true);
-                console.log(familyGroups);
+                $H.calculateTotals($C,$E);
             }
         });
         $A.enqueueAction(getInfo);
@@ -179,6 +160,7 @@
 
                 familyGroups[sourceData.familyindex].UseCases[sourceData.familyIndex - 1] = useCase;
                 $C.set('v.familyGroups',familyGroups);
+                $H.calculateTotals($C,$E);
 
                 window.setTimeout(
                     $A.getCallback(function() {
@@ -198,6 +180,51 @@
     },
     updateLine : function($C,$E,$H){
 
+        var sourceData      = $E.currentTarget.dataset;
+        var familyGroups = $C.get('v.familyGroups');
+        var lineItem   = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
+        lineItem[sourceData.field] = ' pending ';
+        $C.set('v.familyGroups',familyGroups);
+
+        var editAction = $C.get('c.editLineItem');
+        editAction.setParams({lineItem : {Id : lineItem.Id,UnitPrice : lineItem.UnitPrice, Quantity : lineItem.Quantity}});
+        editAction.setCallback(this, function(response){
+
+            if (response.getState() === 'SUCCESS'){
+                lineItem[sourceData.field] = ' successInput ';
+                $C.set('v.familyGroups',familyGroups);
+                $H.calculateTotals($C,$E);
+                window.setTimeout(
+                    $A.getCallback(function() {
+                        lineItem[sourceData.field] = ' ';
+                        $C.set('v.familyGroups',familyGroups);
+                    }), 800
+                );
+           }
+        });
+        $A.enqueueAction(editAction);
+    },
+    setDiscountToAmount : function($C,$E,$H) {
+        var sourceData      = $E.currentTarget.dataset;
+        var familyGroups    = $C.get('v.familyGroups');
+        var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
+        entry.UsesAmount__c = true;
+        $C.set('v.familyGroups',familyGroups);
+        var editAction = $C.get('c.editLineItem');
+        editAction.setParams({lineItem : {Id : entry.Id,UsesAmount__c : true}});
+        editAction.setCallback(this, function(response){
+
+            if (response.getState() === 'SUCCESS'){
+                console.log('successful update');
+            }
+        });
+        $A.enqueueAction(editAction);
+    },
+    setDiscountToPercent : function($C,$E,$H) {
+        var sourceData      = $E.currentTarget.dataset;
+        var familyGroups    = $C.get('v.familyGroups');
+        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex].UsesAmount__c = false;
+        $C.set('v.familyGroups',familyGroups);
     },
     addProductLine : function($C,$E,$H){
         var sourceData      = $E.currentTarget.dataset;
@@ -221,50 +248,42 @@
             year : sourceData.week + 1
         });
         insert.setCallback(this,function (response) {
-            var length      = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries.length;
-            var product     = response.getReturnValue();
-            product.Success = 'success';
-            familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1] = product;
-            $C.set('v.familyGroups',familyGroups);
-            window.setTimeout(
-                $A.getCallback(function() {
-                    familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1].Success = '';
-                    $C.set('v.familyGroups',familyGroups);
-                }), 800
-            );
+            if (response.getState() === 'SUCCESS'){
+                var length      = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries.length;
+                var product     = response.getReturnValue();
+                product.Success = 'success';
+                familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1] = product;
+                $C.set('v.familyGroups',familyGroups);
+                window.setTimeout(
+                    $A.getCallback(function() {
+                        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1].Success = '';
+                        $C.set('v.familyGroups',familyGroups);
+                        $H.calculateTotals($C,$E);
+                    }), 800
+                );
+            }
         });
 
         $A.enqueueAction(insert);
     },
     deleteLine : function($C,$E,$H){
 
-        var sourceData = $E.currentTarget.dataset;
-        var familyGroups = $C.get('v.familyGroups');
+        var sourceData      = $E.currentTarget.dataset;
+        var familyGroups    = $C.get('v.familyGroups');
         familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries.splice(sourceData.entryindex,1);
         $C.set('v.familyGroups',familyGroups);
 
         var deleteAction = $C.get('c.deleteLineItem');
         deleteAction.setParams({itemId : sourceData.entryid});
         deleteAction.setCallback(this,function (response) {
-            if (response.getState() !== 'SUCCESS'){
-
+            if (response.getState() === 'SUCCESS'){
+                $H.calculateTotals($C,$E);
             }
         });
 
         $A.enqueueAction(deleteAction);
     },
-    setDiscountToAmount : function($C,$E,$H) {
-        var sourceData      = $E.currentTarget.dataset;
-        var familyGroups    = $C.get('v.familyGroups');
-        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex].UsesAmount__c = true;
-        $C.set('v.familyGroups',familyGroups);
-    },
-    setDiscountToPercent : function($C,$E,$H) {
-        var sourceData      = $E.currentTarget.dataset;
-        var familyGroups    = $C.get('v.familyGroups');
-        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex].UsesAmount__c = false;
-        $C.set('v.familyGroups',familyGroups);
-    },
+
     calculateDiscountPercent : function($C,$E,$H){
         var sourceData      = $E.currentTarget.dataset;
         var familyGroups    = $C.get('v.familyGroups');
@@ -296,8 +315,4 @@
         $E.currentTarget.value = $C.get('v.vertical') === false ? 'on' : 'off';
         $C.set('v.vertical',!$C.get('v.vertical'));
     }
-
-
-
-
 });

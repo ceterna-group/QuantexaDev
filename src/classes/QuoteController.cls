@@ -108,6 +108,13 @@ public class QuoteController {
     }
 
     @AuraEnabled
+    public static Boolean editLineItem(OpportunityLineItem lineItem){
+
+        update lineItem;
+        return true;
+    }
+
+    @AuraEnabled
     public static Map<String,Object> insertUseCase(String recordId, String useCaseName, String familyName){
 
         String priceBookId          = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :recordId].Pricebook2Id;
