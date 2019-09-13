@@ -315,6 +315,7 @@
             if (response.getState() === 'SUCCESS'){
                 entry.DiscountSuccess = ' successInput ';
                 $C.set('v.familyGroups',familyGroups);
+                $H.calculateTotals($C,$E);
                 window.setTimeout(
                     $A.getCallback(function() {
                         entry.DiscountSuccess = ' ';
@@ -345,6 +346,7 @@
             if (response.getState() === 'SUCCESS'){
                 entry.DiscountSuccess = ' successInput ';
                 $C.set('v.familyGroups',familyGroups);
+                $H.calculateTotals($C,$E);
                 window.setTimeout(
                     $A.getCallback(function() {
                         entry.DiscountSuccess = ' ';
