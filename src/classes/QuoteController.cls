@@ -118,6 +118,11 @@ public class QuoteController {
     public static Map<String,Object> insertUseCase(String recordId, String useCaseName, String familyName){
 
         String priceBookId          = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :recordId].Pricebook2Id;
+        if (priceBookId == null){
+            priceBookId = [SELECT Id FROM Pricebook2 WHERE IsStandard = TRUE LIMIT 1].Id;
+            update new Opportunity(Id = recordId, Pricebook2Id = priceBookId);
+        }
+
         String currencyCode         = [SELECT CurrencyIsoCode FROM Opportunity WHERE Id = :recordId].CurrencyIsoCode;
         Map<Id,Product2> products   = new Map<Id,Product2>([SELECT Id FROM Product2
                                                             WHERE Family = :familyName

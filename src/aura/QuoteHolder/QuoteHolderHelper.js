@@ -40,5 +40,18 @@
             });
         });
         $C.set('v.familyGroups',familyGroups);
+    },
+    showToast : function($C, title, message, type){
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            title : title,
+            message : message,
+            type : type,
+            mode : 'pester'
+        });
+        toastEvent.fire();
+        if (type === 'error'){
+            $A.enqueueAction($C.get('c.doInit'));
+        }
     }
 });

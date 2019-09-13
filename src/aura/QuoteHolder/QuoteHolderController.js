@@ -152,8 +152,6 @@
                             useCase['Year' + entry.Year__c] += entry.TotalPrice;
                             useCase.Total += entry.TotalPrice;
                         }
-
-
                     });
                     useCase.Products.push(prod);
                 });
@@ -200,7 +198,9 @@
                         $C.set('v.familyGroups',familyGroups);
                     }), 800
                 );
-           }
+            } else {
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+            }
         });
         $A.enqueueAction(editAction);
     },
@@ -213,9 +213,8 @@
         var editAction = $C.get('c.editLineItem');
         editAction.setParams({lineItem : {Id : entry.Id,UsesAmount__c : true}});
         editAction.setCallback(this, function(response){
-
-            if (response.getState() === 'SUCCESS'){
-                console.log('successful update');
+            if (response.getState() !== 'SUCCESS'){
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
             }
         });
         $A.enqueueAction(editAction);
@@ -223,8 +222,17 @@
     setDiscountToPercent : function($C,$E,$H) {
         var sourceData      = $E.currentTarget.dataset;
         var familyGroups    = $C.get('v.familyGroups');
-        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex].UsesAmount__c = false;
+        var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
+        entry.UsesAmount__c = false;
         $C.set('v.familyGroups',familyGroups);
+        var editAction = $C.get('c.editLineItem');
+        editAction.setParams({lineItem : {Id : entry.Id,UsesAmount__c : false}});
+        editAction.setCallback(this, function(response){
+            if (response.getState() !== 'SUCCESS'){
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+            }
+        });
+        $A.enqueueAction(editAction);
     },
     addProductLine : function($C,$E,$H){
         var sourceData      = $E.currentTarget.dataset;
@@ -251,7 +259,7 @@
             if (response.getState() === 'SUCCESS'){
                 var length      = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries.length;
                 var product     = response.getReturnValue();
-                product.Success = 'success';
+                product.Success = ' success ';
                 familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[length -1] = product;
                 $C.set('v.familyGroups',familyGroups);
                 window.setTimeout(
@@ -261,6 +269,8 @@
                         $H.calculateTotals($C,$E);
                     }), 800
                 );
+            } else {
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
             }
         });
 
@@ -278,6 +288,9 @@
         deleteAction.setCallback(this,function (response) {
             if (response.getState() === 'SUCCESS'){
                 $H.calculateTotals($C,$E);
+                $H.showToast($C, 'Success', 'Product removed ', 'success');
+            } else {
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
             }
         });
 
@@ -291,25 +304,58 @@
         var discountAmount  = entry.DiscountAmount__c ? entry.DiscountAmount__c : 0;
         var total           = entry.UnitPrice * entry.Quantity -
             (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
-       entry.Discount      = ((discountAmount / total) * 100).toFixed(2);
-        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex] = entry;
+        entry.Discount      = ((discountAmount / total) * 100).toFixed(2);
+        entry.DiscountSuccess = ' pending ';
         $C.set('v.familyGroups',familyGroups);
+        var editAction = $C.get('c.editLineItem');
+        editAction.setParams({lineItem : {Id : entry.Id,DiscountAmount__c : entry.DiscountAmount__c, Discount : entry.Discount}});
+        editAction.setCallback(this, function(response){
+            console.log(response.getState());
+
+            if (response.getState() === 'SUCCESS'){
+                entry.DiscountSuccess = ' successInput ';
+                $C.set('v.familyGroups',familyGroups);
+                window.setTimeout(
+                    $A.getCallback(function() {
+                        entry.DiscountSuccess = ' ';
+                        $C.set('v.familyGroups',familyGroups);
+                    }), 800
+                );
+            } else {
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+            }
+        });
+        $A.enqueueAction(editAction);
     },
     calculateDiscountAmount : function($C,$E,$H){
-
-        console.log('calc amount');
-
         var sourceData      = $E.currentTarget.dataset;
         var familyGroups    = $C.get('v.familyGroups');
         var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
         var discountPercent = entry.Discount ? entry.Discount : 0;
         var total           = entry.UnitPrice * entry.Quantity -
             (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
-        entry.DiscountAmount  = (total * (discountPercent / 100)).toFixed(2);
-        console.log('amt is ' + (total * (discountPercent / 100)).toFixed(2));
-        console.log(entry);
-        familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex] = entry;
+        entry.DiscountAmount__c  = (total * (discountPercent / 100)).toFixed(2);
+        entry.DiscountSuccess = ' pending ';
         $C.set('v.familyGroups',familyGroups);
+        $C.set('v.familyGroups',familyGroups);
+        var editAction = $C.get('c.editLineItem');
+        editAction.setParams({lineItem : {Id : entry.Id,DiscountAmount__c : entry.DiscountAmount__c, Discount : entry.Discount}});
+        editAction.setCallback(this, function(response){
+            console.log(response.getState());
+            if (response.getState() === 'SUCCESS'){
+                entry.DiscountSuccess = ' successInput ';
+                $C.set('v.familyGroups',familyGroups);
+                window.setTimeout(
+                    $A.getCallback(function() {
+                        entry.DiscountSuccess = ' ';
+                        $C.set('v.familyGroups',familyGroups);
+                    }), 800
+                );
+            } else {
+                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+            }
+        });
+        $A.enqueueAction(editAction);
     },
     toggleVertical : function($C,$E,$H){
         $E.currentTarget.value = $C.get('v.vertical') === false ? 'on' : 'off';
