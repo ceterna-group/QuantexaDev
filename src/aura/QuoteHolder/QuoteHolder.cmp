@@ -26,8 +26,7 @@
             </div>
         </div>
         <div class="slds-p-around--small" style="font-size: 20px;">
-            QUOTE PREVIEW
-            <span style="padding-left: 3px;padding-right: 3px;color:white;background-color: grey;border-radius: 4px;">IN DEVELOPMENT</span>
+            PRODUCT SELECTOR
         </div>
         <aura:iteration items="{!v.familyGroups}" var="group" indexVar="familyIndex">
             <div class="family slds-p-around--small">
@@ -86,7 +85,7 @@
                                                 <lightning:icon iconName="utility:custom_apps" size="small" />
                                             </div>
                                             <div style="margin-left: 5px;">
-                                                <div style="font-size: 9px;font-weight: normal;">PRODUCT</div>
+                                                <div style="font-size: 9px;font-weight: normal;">CORE CAPABILITY</div>
                                                 <div style="position: absolute;">{!prod.Name}</div>
                                             </div>
                                         </div>
