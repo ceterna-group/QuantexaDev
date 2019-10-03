@@ -176,33 +176,52 @@
 
         $A.enqueueAction(insert);
     },
+    setChanged : function($C,$E,$H){
+        console.log('item changed');
+
+        var sourceData      = $E.currentTarget.dataset;
+        var familyGroups    = $C.get('v.familyGroups');
+        var lineItem        = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
+        lineItem.Changed    = true;
+        // lineItem.OldValue   = '';
+        $C.set('v.familyGroups',familyGroups);
+
+        console.log(lineItem);
+
+    },
     updateLine : function($C,$E,$H){
 
         var sourceData      = $E.currentTarget.dataset;
-        var familyGroups = $C.get('v.familyGroups');
-        var lineItem   = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
-        lineItem[sourceData.field] = ' pending ';
-        $C.set('v.familyGroups',familyGroups);
+        var familyGroups    = $C.get('v.familyGroups');
+        var lineItem        = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
 
-        var editAction = $C.get('c.editLineItem');
-        editAction.setParams({lineItem : {Id : lineItem.Id,UnitPrice : lineItem.UnitPrice, Quantity : lineItem.Quantity}});
-        editAction.setCallback(this, function(response){
+        if (lineItem.Changed){
+            lineItem[sourceData.field] = ' pending ';
+            $C.set('v.familyGroups',familyGroups);
 
-            if (response.getState() === 'SUCCESS'){
-                lineItem[sourceData.field] = ' successInput ';
-                $C.set('v.familyGroups',familyGroups);
-                $H.calculateTotals($C,$E);
-                window.setTimeout(
-                    $A.getCallback(function() {
-                        lineItem[sourceData.field] = ' ';
-                        $C.set('v.familyGroups',familyGroups);
-                    }), 800
-                );
-            } else {
-                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
-            }
-        });
-        $A.enqueueAction(editAction);
+            var editAction = $C.get('c.editLineItem');
+            editAction.setParams({lineItem : {Id : lineItem.Id, UnitPrice : lineItem.UnitPrice, Quantity : lineItem.Quantity}});
+            editAction.setCallback(this, function(response){
+                lineItem.Changed    = false;
+
+                if (response.getState() === 'SUCCESS'){
+                    lineItem[sourceData.field] = ' successInput ';
+                    $C.set('v.familyGroups',familyGroups);
+                    $H.calculateTotals($C,$E);
+                    window.setTimeout(
+                        $A.getCallback(function() {
+                            lineItem[sourceData.field] = ' ';
+                            $C.set('v.familyGroups',familyGroups);
+                        }), 800
+                    );
+                } else {
+                    $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+                }
+            });
+            $A.enqueueAction(editAction);
+        }
+
+
     },
     setDiscountToAmount : function($C,$E,$H) {
         var sourceData      = $E.currentTarget.dataset;
@@ -301,63 +320,81 @@
         var sourceData      = $E.currentTarget.dataset;
         var familyGroups    = $C.get('v.familyGroups');
         var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
-        var discountAmount  = entry.DiscountAmount__c ? entry.DiscountAmount__c : 0;
-        var total           = entry.UnitPrice * entry.Quantity -
-            (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
-        entry.Discount      = ((discountAmount / total) * 100).toFixed(2);
-        entry.DiscountSuccess = ' pending ';
-        $C.set('v.familyGroups',familyGroups);
-        var editAction = $C.get('c.editLineItem');
-        editAction.setParams({lineItem : {Id : entry.Id,DiscountAmount__c : entry.DiscountAmount__c, Discount : entry.Discount}});
-        editAction.setCallback(this, function(response){
-            console.log(response.getState());
 
-            if (response.getState() === 'SUCCESS'){
-                entry.DiscountSuccess = ' successInput ';
-                $C.set('v.familyGroups',familyGroups);
-                $H.calculateTotals($C,$E);
-                window.setTimeout(
-                    $A.getCallback(function() {
-                        entry.DiscountSuccess = ' ';
-                        $C.set('v.familyGroups',familyGroups);
-                    }), 800
-                );
-            } else {
-                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
-            }
-        });
-        $A.enqueueAction(editAction);
+        if (entry.Changed && !isNaN(entry.Discount)) {
+            var discountAmount = entry.DiscountAmount__c ? entry.DiscountAmount__c : 0;
+            var total = entry.UnitPrice * entry.Quantity -
+                (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
+            entry.Discount = ((discountAmount / total) * 100).toFixed(2);
+            entry.DiscountSuccess = ' pending ';
+            $C.set('v.familyGroups', familyGroups);
+            var editAction = $C.get('c.editLineItem');
+            editAction.setParams({
+                lineItem: {
+                    Id: entry.Id,
+                    DiscountAmount__c: entry.DiscountAmount__c,
+                    Discount: entry.Discount
+                }
+            });
+            editAction.setCallback(this, function (response) {
+                console.log(response.getState());
+
+                if (response.getState() === 'SUCCESS') {
+                    entry.DiscountSuccess = ' successInput ';
+                    $C.set('v.familyGroups', familyGroups);
+                    $H.calculateTotals($C, $E);
+                    window.setTimeout(
+                        $A.getCallback(function () {
+                            entry.DiscountSuccess = ' ';
+                            $C.set('v.familyGroups', familyGroups);
+                        }), 800
+                    );
+                } else {
+                    $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+                }
+            });
+            $A.enqueueAction(editAction);
+        }
     },
     calculateDiscountAmount : function($C,$E,$H){
         var sourceData      = $E.currentTarget.dataset;
         var familyGroups    = $C.get('v.familyGroups');
         var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
-        var discountPercent = entry.Discount ? entry.Discount : 0;
-        var total           = entry.UnitPrice * entry.Quantity -
-            (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
-        entry.DiscountAmount__c  = (total * (discountPercent / 100)).toFixed(2);
-        entry.DiscountSuccess = ' pending ';
-        $C.set('v.familyGroups',familyGroups);
-        $C.set('v.familyGroups',familyGroups);
-        var editAction = $C.get('c.editLineItem');
-        editAction.setParams({lineItem : {Id : entry.Id,DiscountAmount__c : entry.DiscountAmount__c, Discount : entry.Discount}});
-        editAction.setCallback(this, function(response){
-            console.log(response.getState());
-            if (response.getState() === 'SUCCESS'){
-                entry.DiscountSuccess = ' successInput ';
-                $C.set('v.familyGroups',familyGroups);
-                $H.calculateTotals($C,$E);
-                window.setTimeout(
-                    $A.getCallback(function() {
-                        entry.DiscountSuccess = ' ';
-                        $C.set('v.familyGroups',familyGroups);
-                    }), 800
-                );
-            } else {
-                $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
-            }
-        });
-        $A.enqueueAction(editAction);
+
+        if (entry.Changed && !isNaN(entry.Discount)) {
+            var discountPercent = entry.Discount ? entry.Discount : 0;
+            var total = entry.UnitPrice * entry.Quantity -
+                (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
+            entry.DiscountAmount__c = (total * (discountPercent / 100)).toFixed(2);
+            entry.DiscountSuccess = ' pending ';
+            $C.set('v.familyGroups', familyGroups);
+            $C.set('v.familyGroups', familyGroups);
+            var editAction = $C.get('c.editLineItem');
+            editAction.setParams({
+                lineItem: {
+                    Id: entry.Id,
+                    DiscountAmount__c: entry.DiscountAmount__c,
+                    Discount: entry.Discount
+                }
+            });
+            editAction.setCallback(this, function (response) {
+                console.log(response.getState());
+                if (response.getState() === 'SUCCESS') {
+                    entry.DiscountSuccess = ' successInput ';
+                    $C.set('v.familyGroups', familyGroups);
+                    $H.calculateTotals($C, $E);
+                    window.setTimeout(
+                        $A.getCallback(function () {
+                            entry.DiscountSuccess = ' ';
+                            $C.set('v.familyGroups', familyGroups);
+                        }), 800
+                    );
+                } else {
+                    $H.showToast($C, 'Error', 'There was an error saving your update', 'error');
+                }
+            });
+            $A.enqueueAction(editAction);
+        }
     },
     toggleVertical : function($C,$E,$H){
         $E.currentTarget.value = $C.get('v.vertical') === false ? 'on' : 'off';
