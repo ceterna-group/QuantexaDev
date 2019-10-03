@@ -139,7 +139,7 @@
                                                 </span>
 												<aura:if isTrue="{!entry.UsesAmount__c}">
 													<span onkeyup="{!c.setChanged}" onfocusout="{!c.calculateDiscountPercent}" data-familyindex="{!familyIndex}"
-                                                          data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
+                                                          data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}" data-type="amt"
                                                           data-id="{!prod.Id}" data-entryid="{!entry.Id}"  data-entryindex="{!entryIndex}">
 														<lightning:input value="{!entry.DiscountAmount__c}" type="number" min="0"  step="0.01"
                                                                          class="{!entry.DiscountSuccess + ' fade '}" disabled="{!entry.UnitPrice &lt; 0.01}"
@@ -148,10 +148,10 @@
 													</span>
 													<aura:set attribute="else">
 														<span onkeyup="{!c.setChanged}" onfocusout="{!c.calculateDiscountAmount}" data-familyindex="{!familyIndex}"
-                                                              data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}"
+                                                              data-usecaseindex="{!useCaseIndex}" data-productindex="{!productIndex}" data-type="pct"
                                                               data-id="{!prod.Id}" data-entryid="{!entry.Id}" data-entryindex="{!entryIndex}">
 															<lightning:input value="{!entry.Discount}" type="number" min="0"  step="0.01"
-                                                                             class="{!entry.DiscountSuccess + ' fade '}"
+                                                                             class="{!entry.DiscountSuccess + ' fade '}" disabled="{!entry.UnitPrice &lt; 0.01}"
                                                                              messageWhenBadInput=''
                                                                              variant="label-hidden" style="max-width:120px;text-align:right;"/>
 														</span>
@@ -187,7 +187,6 @@
 												<lightning:input value="" type="number" disabled="true" style="max-width:120px;text-align:right;" />
 											</div>
 											<div class="{!'value ' + (v.vertical ? ' verticalRow ' : '')}">
-<!--												<lightning:input value="" type="number" disabled="true" style="max-width:120px;text-align:right;" />-->
 											</div>
 										</div>
 									</aura:if>

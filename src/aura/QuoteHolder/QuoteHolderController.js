@@ -177,16 +177,41 @@
         $A.enqueueAction(insert);
     },
     setChanged : function($C,$E,$H){
-        console.log('item changed');
 
         var sourceData      = $E.currentTarget.dataset;
         var familyGroups    = $C.get('v.familyGroups');
         var lineItem        = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
         lineItem.Changed    = true;
-        // lineItem.OldValue   = '';
-        $C.set('v.familyGroups',familyGroups);
 
-        console.log(lineItem);
+        // IN HERE
+        // if the unit price field has been changed, work out if the discount needs to be chopped
+
+        // if (sourceData.type){
+        //     if (sourceData.type === 'amt' && lineItem.DiscountAmount__c > lineItem.UnitPrice){
+        //         lineItem.Discount = 100;
+        //         lineItem.DiscountAmount__c = lineItem.UnitPrice;
+        //     } else if (sourceData.type === 'pct' && lineItem.Discount > 100){
+        //         lineItem.Discount = 100;
+        //         lineItem.DiscountAmount__c = lineItem.UnitPrice;
+        //     }
+        //
+        //
+        // }
+
+        if (lineItem.DiscountAmount__c > lineItem.UnitPrice || lineItem.Discount > 100){
+            lineItem.DiscountAmount__c = lineItem.UnitPrice;
+            lineItem.Discount = 100;
+
+            console.log('disc amt is ' + lineItem.DiscountAmount__c);
+            console.log('disc pct is ' + lineItem.Discount);
+
+
+        }
+
+
+
+
+        $C.set('v.familyGroups',familyGroups);
 
     },
     updateLine : function($C,$E,$H){
@@ -322,11 +347,9 @@
         var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
 
         if (entry.Changed && !isNaN(entry.Discount)) {
-            var discountAmount = entry.DiscountAmount__c ? entry.DiscountAmount__c : 0;
-            var total = entry.UnitPrice * entry.Quantity -
-                (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
-            entry.Discount = ((discountAmount / total) * 100).toFixed(2);
-            entry.DiscountSuccess = ' pending ';
+            var discountAmount      = entry.DiscountAmount__c ? entry.DiscountAmount__c : 0;
+            entry.Discount          = ((discountAmount / entry.UnitPrice) * 100).toFixed(2);
+            entry.DiscountSuccess   = ' pending ';
             $C.set('v.familyGroups', familyGroups);
             var editAction = $C.get('c.editLineItem');
             editAction.setParams({
@@ -362,11 +385,8 @@
         var entry           = familyGroups[sourceData.familyindex].UseCases[sourceData.usecaseindex].Products[sourceData.productindex].Entries[sourceData.entryindex];
 
         if (entry.Changed && !isNaN(entry.Discount)) {
-            var discountPercent = entry.Discount ? entry.Discount : 0;
-            var total = entry.UnitPrice * entry.Quantity -
-                (entry.Discount ? ((entry.UnitPrice * entry.Quantity) * (entry.Discount / 100)) : 0);
-            entry.DiscountAmount__c = (total * (discountPercent / 100)).toFixed(2);
-            entry.DiscountSuccess = ' pending ';
+            entry.DiscountAmount__c     = (entry.UnitPrice * (entry.Discount / 100)).toFixed(2);
+            entry.DiscountSuccess       = ' pending ';
             $C.set('v.familyGroups', familyGroups);
             $C.set('v.familyGroups', familyGroups);
             var editAction = $C.get('c.editLineItem');

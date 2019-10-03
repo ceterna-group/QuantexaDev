@@ -100,18 +100,19 @@ public class QuoteController {
     }
 
     @AuraEnabled
-    public static Boolean deleteLineItem(String itemId){
-
-        delete new OpportunityLineItem(Id = itemId);
-        return true;
-
+    public static Object deleteLineItem(String itemId){
+        String res = 'success';
+        try { delete new OpportunityLineItem(Id = itemId);}
+        catch (Exception e){ res = e.getMessage(); }
+        return res;
     }
 
     @AuraEnabled
-    public static Boolean editLineItem(OpportunityLineItem lineItem){
-
-        update lineItem;
-        return true;
+    public static Object editLineItem(OpportunityLineItem lineItem){
+        String res = 'success';
+        try { update lineItem; }
+        catch (Exception e){ res = e.getMessage(); }
+        return res;
     }
 
     @AuraEnabled
