@@ -118,7 +118,7 @@ public class QuoteController {
     @AuraEnabled
     public static Map<String,Object> insertUseCase(String recordId, String useCaseName, String familyName){
 
-        String priceBookId          = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :recordId].Pricebook2Id;
+        String priceBookId  = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :recordId].Pricebook2Id;
         if (priceBookId == null){
             priceBookId = [SELECT Id FROM Pricebook2 WHERE IsStandard = TRUE LIMIT 1].Id;
             update new Opportunity(Id = recordId, Pricebook2Id = priceBookId);
